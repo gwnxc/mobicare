@@ -3,5 +3,10 @@
     <style name="Base.Theme.Mobicare" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/trust_blue</item>
+
+        <!-- This sets the app-wide font to Roboto -->
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
 </resources>

@@ -1,0 +1,756 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA"
+    tools:context=".AddConsultationFragment">
+
+    <View
+        android:id="@+id/headerBackground"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:background="@drawable/header_rounded_bottom"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnBackConsultation"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back"
+        android:padding="12dp"
+        android:src="@drawable/ic_back_white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/pure_white" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:text="Add New Record"
+        android:textStyle="bold"
+        android:textColor="@color/pure_white"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnBackConsultation" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Health Information"
+        android:textColor="#CCFFFFFF"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:paddingBottom="50dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F0F0F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Record Type"
+                        android:textStyle="bold"
+                        android:textColor="@color/slate_navy"
+                        android:textSize="14sp" />
+
+                    <GridLayout
+                        android:id="@+id/glRecordTypes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:columnCount="2"
+                        android:alignmentMode="alignMargins">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardConsultation"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            app:cardBackgroundColor="@color/pure_white"
+                            app:cardCornerRadius="16dp"
+                            app:strokeColor="#EEEEEE"
+                            app:strokeWidth="1dp">
+
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical" android:padding="16dp">
+                                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_consultation" app:tint="@color/cool_grey" />
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"  android:text="Consultation" android:textStyle="bold" android:textColor="@color/cool_grey" android:textSize="12sp" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardImmunization"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            app:cardBackgroundColor="@color/pure_white"
+                            app:cardCornerRadius="16dp"
+                            app:strokeColor="#EEEEEE"
+                            app:strokeWidth="1dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical" android:padding="16dp">
+                                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_vaccination" app:tint="@color/cool_grey" />
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"  android:text="Immunization" android:textStyle="bold" android:textColor="@color/cool_grey" android:textSize="12sp" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardMedicine"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            app:cardBackgroundColor="@color/pure_white"
+                            app:cardCornerRadius="16dp"
+                            app:strokeColor="#EEEEEE"
+                            app:strokeWidth="1dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical" android:padding="16dp">
+                                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_medicine" app:tint="@color/cool_grey" />
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"  android:text="Medicine" android:textColor="@color/cool_grey" android:textStyle="bold" android:textSize="12sp" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardPrenatal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:layout_margin="6dp"
+                            app:cardBackgroundColor="@color/pure_white"
+                            app:cardCornerRadius="16dp"
+                            app:strokeColor="#EEEEEE"
+                            app:strokeWidth="1dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical" android:padding="16dp">
+                                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_pren" app:tint="@color/cool_grey" />
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"  android:text="Prenatal Care" android:textColor="@color/cool_grey" android:textStyle="bold" android:textSize="12sp" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </GridLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F0F0F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:id="@+id/layoutConsultationSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/tvSelectPatientLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Select Patient Type"
+                            android:textColor="@color/slate_navy" />
+
+                        <Spinner
+                            android:id="@+id/spinnerPatientType"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Search Patient Name"
+                            android:textColor="@color/slate_navy" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:hintEnabled="false"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/autoCompletePatient"
+                                android:layout_width="match_parent"
+                                android:layout_height="55dp"
+                                android:background="@drawable/edittext_rounded_bg"
+                                android:completionThreshold="1"
+                                android:hint="Search or type name..."
+                                android:inputType="textPersonName"
+                                android:padding="12dp"
+                                android:textColor="@color/slate_navy"
+                                android:textSize="14sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <!-- 1. CONSULTATION FIELDS CONTAINER -->
+                    <LinearLayout
+                        android:id="@+id/layoutConsultationFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <!-- Shared Date Field -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Date"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etConsultDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:focusable="false"
+                            android:hint="dd/mm/yyyy"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <!-- COMMON GROUP: Hidden for Prenatal/Immunization -->
+                        <LinearLayout
+                            android:id="@+id/layoutCommonConsultation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:text="Time"
+                                android:textColor="@color/slate_navy" />
+
+                            <EditText
+                                android:id="@+id/etConsultTime"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/edittext_rounded_bg"
+                                android:focusable="false"
+                                android:hint="--:-- --"
+                                android:padding="12dp"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:text="Purpose"
+                                android:textColor="@color/slate_navy" />
+
+                            <EditText
+                                android:id="@+id/etPurpose"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/edittext_rounded_bg"
+                                android:hint="e.g., Regular Checkup, Postnatal Care"
+                                android:padding="12dp"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:text="Notes (Optional)"
+                                android:textColor="@color/slate_navy" />
+
+                            <EditText
+                                android:id="@+id/etNotes"
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/edittext_rounded_bg"
+                                android:gravity="top"
+                                android:hint="Additional observations"
+                                android:padding="12dp"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Shared Health Worker Field -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Health Worker"
+                            android:textColor="@color/slate_navy" />
+
+                        <AutoCompleteTextView
+                            android:id="@+id/etHealthWorker"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="Name of Health Worker"
+                            android:padding="12dp"
+                            android:textSize="14sp"
+                            android:completionThreshold="1" />
+
+                        <!-- AALISIN TO?
+                        <TextView
+                            android:id="@+id/tvSelectedPatientUid"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone" />
+                            -->
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layoutImmunizationFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Child Name"
+                            android:textColor="@color/slate_navy" />
+
+                        <AutoCompleteTextView
+                            android:id="@+id/autoCompleteChild"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="Search child name..."
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Parent/Guardian Name"
+                            android:textColor="@color/slate_navy" />
+
+                        <AutoCompleteTextView
+                            android:id="@+id/autoCompleteMother"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="Search parent/guardian name..."
+                            android:padding="12dp"
+                            android:textSize="14sp"
+                            android:focusable="false"
+                            android:cursorVisible="false" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Vaccine Type"
+                            android:textColor="@color/slate_navy" />
+
+                        <Spinner
+                            android:id="@+id/spinnerVaccineType"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Dose No."
+                                    android:textColor="@color/slate_navy" />
+
+                                <Spinner
+                                    android:id="@+id/spinnerDoseNo"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:layout_marginTop="8dp"
+                                    android:background="@drawable/edittext_rounded_bg" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1.5"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Scheduled Age"
+                                    android:textColor="@color/slate_navy" />
+
+                                <Spinner
+                                    android:id="@+id/spinnerScheduledAge"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:layout_marginTop="8dp"
+                                    android:background="@drawable/edittext_rounded_bg" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Date Administered"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etImmDateAdministered"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:focusable="false"
+                            android:hint="dd/mm/yyyy"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Administered By"
+                            android:textColor="@color/slate_navy" />
+
+                        <AutoCompleteTextView
+                            android:id="@+id/etAdminBy"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="Name of health worker"
+                            android:padding="12dp"
+                            android:textSize="14sp"
+                            android:completionThreshold="1" />
+
+                        <TextView
+                            android:layout_marginTop="16dp"
+                            android:text="Next Immunization Date"
+                            android:textColor="@color/slate_navy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <EditText
+                            android:id="@+id/etNextImmDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:focusable="false"
+                            android:hint="dd/mm/yyyy"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <!-- 2. PRENATAL FIELDS (Cleaned of duplicate labels) -->
+                    <LinearLayout
+                        android:id="@+id/layoutPrenatalFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Blood Pressure (mmHg)"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etPrenatalBP"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="e.g., 120/80"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Weight"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etPrenatalWeight"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="e.g., 60 kg"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Fundal Height (FH)"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etFundalHeight"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="e.g., 24 cm"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Fetal Heart Tone (FHT)"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etFetalHeartTone"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="e.g., 140 bpm"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="TT Given (Tetanus Toxoid)"
+                            android:textColor="@color/slate_navy" />
+
+                        <Spinner
+                            android:id="@+id/spinnerTetanusToxoid"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Diagnosis/Treatment (Optional)"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etDiagnosisTreatment"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:gravity="top"
+                            android:hint="Enter diagnosis or treatment notes"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+                        <TextView
+                            android:id="@+id/tvReturnCheckupLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Return Checkup"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etReturnCheckup"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:focusable="false"
+                            android:hint="dd/mm/yyyy"
+                            android:padding="12dp"
+                            android:textSize="14sp"
+                            android:drawableEnd="@android:drawable/ic_menu_day" />
+                    </LinearLayout>
+
+                    <!-- 3. MEDICINE FIELDS -->
+
+                    <LinearLayout
+                        android:id="@+id/layoutMedicineFields"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Medicine Name"
+                            android:textColor="@color/slate_navy"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:hintEnabled="false"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/autoCompleteMedicine"
+                                android:layout_width="match_parent"
+                                android:layout_height="55dp"
+                                android:background="@drawable/edittext_rounded_bg"
+                                android:completionThreshold="1"
+                                android:hint="Search medicine..."
+                                android:padding="12dp"
+                                android:textSize="14sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Dosage"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etMedDosage"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="e.g., 500mg, 10mg"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Quantity"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etMedQty"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="Enter amount"
+                            android:inputType="number"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Dispensed By"
+                            android:textColor="@color/slate_navy" />
+
+                        <AutoCompleteTextView
+                            android:id="@+id/etDispensedBy"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="Select health worker"
+                            android:padding="12dp"
+                            android:textSize="14sp"
+                            android:completionThreshold="1" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Purpose"
+                            android:textColor="@color/slate_navy" />
+
+                        <EditText
+                            android:id="@+id/etMedPurpose"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/edittext_rounded_bg"
+                            android:hint="e.g., Fever, Infection"
+                            android:padding="12dp"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveRecord"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="32dp"
+                        android:text="Save Record"
+                        android:textAllCaps="false"
+                        android:textColor="@color/pure_white"
+                        app:backgroundTint="@color/healing_green"
+                        app:cornerRadius="12dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

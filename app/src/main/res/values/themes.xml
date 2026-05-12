@@ -1,9 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
     <style name="Base.Theme.Mobicare" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
+        <item name="colorPrimary">@color/healing_green</item>
+        <item name="colorOnPrimary">@color/pure_white</item>
+        <item name="colorPrimaryContainer">@color/healing_green</item>
+        <item name="colorOnPrimaryContainer">@color/pure_white</item>
+        <item name="android:statusBarColor">#155A91</item>
+    </style>
+
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
     </style>
 
     <style name="Theme.Mobicare" parent="Base.Theme.Mobicare" />
+
 </resources>

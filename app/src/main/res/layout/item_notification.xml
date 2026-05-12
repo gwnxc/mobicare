@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Icon Container -->
+        <ImageView
+            android:id="@+id/ivNotifIcon"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/circle_light_blue"
+            android:padding="10dp"
+            android:src="@android:drawable/ic_menu_today"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/trust_blue" />
+
+        <!-- Notification Content -->
+        <TextView
+            android:id="@+id/tvNotifTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="Upcoming Checkup"
+            android:textStyle="bold"
+            android:textColor="@color/slate_navy"
+            android:textSize="16sp"
+
+            app:layout_constraintEnd_toStartOf="@+id/ivUnreadDot"
+            app:layout_constraintStart_toEndOf="@+id/ivNotifIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvNotifMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Juan Santos has a checkup scheduled..."
+            android:textColor="@color/slate_navy"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@+id/tvNotifTitle"
+            app:layout_constraintStart_toStartOf="@+id/tvNotifTitle"
+            app:layout_constraintTop_toBottomOf="@+id/tvNotifTitle" />
+
+        <TextView
+            android:id="@+id/tvNotifDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="2026-04-30"
+            android:textColor="@color/slate_navy"
+            android:textSize="11sp"
+            app:layout_constraintStart_toStartOf="@+id/tvNotifTitle"
+            app:layout_constraintTop_toBottomOf="@+id/tvNotifMessage" />
+
+        <!-- Unread Dot Indicator -->
+        <ImageView
+            android:id="@+id/ivUnreadDot"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:src="@drawable/circle_red"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

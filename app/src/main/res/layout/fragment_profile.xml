@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA"
+    tools:context=".ProfileFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="100dp">
+
+            <View
+                android:id="@+id/headerBackground"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@drawable/header_rounded_bottom"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/btnBackProfile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_back_white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/pure_white" />
+
+            <LinearLayout
+                android:id="@+id/containerLogout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/btnBackProfile"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnBackProfile">
+
+                <ImageView
+                    android:id="@+id/btnLogout"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/circle_white_alpha"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    app:tint="@color/pure_white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Log out"
+                    android:textColor="@color/pure_white"
+                    android:textSize="10sp"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvMyProfileLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="12dp"
+                android:text="My Profile"
+                android:textColor="@color/pure_white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnBackProfile" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvProfileMain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@+id/tvMyProfileLabel">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="24dp">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivProfilePic"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:background="#961565C0"
+                            android:padding="16dp"
+                            android:src="@drawable/ic_profile"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:shapeAppearanceOverlay="@style/CircleImage"
+                            app:tint="@color/pure_white" />
+
+                        <TextView
+                            android:id="@+id/tvProfileFullName"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:text="Emma Cruz"
+                            android:textColor="@color/slate_navy"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/ivProfilePic"
+                            app:layout_constraintTop_toTopOf="@+id/ivProfilePic" />
+
+                        <TextView
+                            android:id="@+id/tvProfileSubtitleRole"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Midwifery"
+                            android:textColor="#423F3F"
+                            app:layout_constraintStart_toStartOf="@+id/tvProfileFullName"
+                            app:layout_constraintTop_toBottomOf="@+id/tvProfileFullName" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            app:layout_constraintStart_toStartOf="@+id/tvProfileSubtitleRole"
+                            app:layout_constraintTop_toBottomOf="@+id/tvProfileSubtitleRole">
+
+                            <View
+                                android:layout_width="8dp"
+                                android:layout_height="8dp"
+                                android:background="@drawable/badge_green" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:text="Active"
+                                android:textColor="#4CAF50"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <include layout="@layout/item_profile_info" android:id="@+id/layoutUsername" />
+                    <include layout="@layout/item_profile_info" android:id="@+id/layoutPhone" />
+                    <include layout="@layout/item_profile_info" android:id="@+id/layoutEmail" />
+                    <include layout="@layout/item_profile_info" android:id="@+id/layoutSpec" />
+                    <include layout="@layout/item_profile_info" android:id="@+id/layoutDate" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvQuickActionsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="32dp"
+                android:text="Quick Actions"
+                android:textColor="@color/slate_navy"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cvProfileMain" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvAddRecordProfile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@+id/tvQuickActionsLabel">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivIconAdd"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/circle_light_green"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_completed"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="#4CAF50" />
+
+                    <TextView
+                        android:id="@+id/tvAddTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Add New Record"
+                        android:textColor="@color/slate_navy"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toStartOf="@+id/ivArrowAdd"
+                        app:layout_constraintStart_toEndOf="@+id/ivIconAdd"
+                        app:layout_constraintTop_toTopOf="@+id/ivIconAdd" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Create health records for patients"
+                        android:textColor="#8E8E8E"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="@+id/tvAddTitle"
+                        app:layout_constraintStart_toStartOf="@+id/tvAddTitle"
+                        app:layout_constraintTop_toBottomOf="@+id/tvAddTitle" />
+
+                    <ImageView
+                        android:id="@+id/ivArrowAdd"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="#BDBDBD" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvViewConsultationsProfile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@+id/cvAddRecordProfile">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivIconConsult"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/circle_light_blue"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_consultation"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/trust_blue" />
+
+                    <TextView
+                        android:id="@+id/tvConsultTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="View Consultations"
+                        android:textColor="@color/slate_navy"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toStartOf="@+id/ivArrowConsult"
+                        app:layout_constraintStart_toEndOf="@+id/ivIconConsult"
+                        app:layout_constraintTop_toTopOf="@+id/ivIconConsult" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Manage scheduled visits"
+                        android:textColor="#8E8E8E"
+                        android:textSize="12sp"
+                        app:layout_constraintEnd_toEndOf="@+id/tvConsultTitle"
+                        app:layout_constraintStart_toStartOf="@+id/tvConsultTitle"
+                        app:layout_constraintTop_toBottomOf="@+id/tvConsultTitle" />
+
+                    <ImageView
+                        android:id="@+id/ivArrowConsult"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="#BDBDBD" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>                </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

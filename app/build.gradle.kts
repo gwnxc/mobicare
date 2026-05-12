@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services") // Add this line here
 }
 
 android {
@@ -41,7 +42,15 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.gridlayout)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // 1. Import the Firebase BoM (Keep this)
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+
+    // 2. Add Firebase dependencies WITHOUT versions (BoM handles it)
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
 }
