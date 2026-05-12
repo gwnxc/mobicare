@@ -22,12 +22,26 @@
         android:name="com.example.mobicare.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
+
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
+
         <action
             android:id="@+id/action_loginFragment_to_healthWorkerDashboardFragment"
             app:destination="@id/healthWorkerDashboardFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_loginFragment_to_adminDashboardFragment"
+            app:destination="@id/adminDashboardFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_loginFragment_to_patientDashboardFragment"
+            app:destination="@id/patientDashboardFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
@@ -39,9 +53,207 @@
         tools:layout="@layout/fragment_register" />
 
     <fragment
+        android:id="@+id/adminDashboardFragment"
+        android:name="com.example.mobicare.adminDashboardFragment"
+        android:label="Admin Dashboard"
+        tools:layout="@layout/fragment_admin_dashboard">
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_healthWorkerManagementFragment"
+            app:destination="@id/healthWorkerManagementFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_registerPatientFragment"
+            app:destination="@id/registerPatientFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_consultationsFragment"
+            app:destination="@id/consultationsFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_viewMothersFragment"
+            app:destination="@id/viewMothersFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_inventoryFragment"
+            app:destination="@id/inventoryFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_alertsFragment"
+            app:destination="@id/alertsFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
         android:id="@+id/healthWorkerDashboardFragment"
         android:name="com.example.mobicare.HealthWorkerDashboardFragment"
         android:label="Health Worker Dashboard"
         tools:layout="@layout/fragment_health_worker_dashboard" />
+
+    <fragment
+        android:id="@+id/healthWorkerManagementFragment"
+        android:name="com.example.mobicare.health_worker_management"
+        android:label="Health Worker Management"
+        tools:layout="@layout/fragment_health_worker_management" />
+
+    <fragment
+        android:id="@+id/registerPatientFragment"
+        android:name="com.example.mobicare.registerPatient"
+        android:label="Register Patient"
+        tools:layout="@layout/fragment_register_patient" />
+
+    <fragment
+        android:id="@+id/consultationsFragment"
+        android:name="com.example.mobicare.consultations"
+        android:label="Consultations"
+        tools:layout="@layout/fragment_consultations" />
+
+    <fragment
+        android:id="@+id/viewMothersFragment"
+        android:name="com.example.mobicare.view_mothers"
+        android:label="View Mothers"
+        tools:layout="@layout/fragment_view_mothers" />
+
+    <fragment
+        android:id="@+id/inventoryFragment"
+        android:name="com.example.mobicare.inventory"
+        android:label="Inventory"
+        tools:layout="@layout/fragment_inventory">
+
+        <action
+            android:id="@+id/action_inventoryFragment_to_adminDashboardFragment"
+            app:destination="@id/adminDashboardFragment" />
+
+        <action
+            android:id="@+id/action_inventoryFragment_to_alertsFragment"
+            app:destination="@id/alertsFragment" />
+
+        <action
+            android:id="@+id/action_inventoryFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/alertsFragment"
+        android:name="com.example.mobicare.alert"
+        android:label="Alerts"
+        tools:layout="@layout/fragment_alert">
+
+        <action
+            android:id="@+id/action_alertsFragment_to_adminDashboardFragment"
+            app:destination="@id/adminDashboardFragment" />
+        <action
+            android:id="@+id/action_alertsFragment_to_inventoryFragment"
+            app:destination="@id/inventoryFragment" />
+        <action
+            android:id="@+id/action_alertsFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.mobicare.profile"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile">
+
+        <action
+            android:id="@+id/action_profileFragment_to_adminDashboardFragment"
+            app:destination="@id/adminDashboardFragment" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_inventoryFragment"
+            app:destination="@id/inventoryFragment" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_alertsFragment"
+            app:destination="@id/alertsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/patientDashboardFragment"
+        android:name="com.example.mobicare.patientDashboardFragment"
+        android:label="Patient Dashboard"
+        tools:layout="@layout/fragment_patient_dashboard">
+
+        <action
+            android:id="@+id/action_patientDashboardFragment_to_myChildrenFragment"
+            app:destination="@id/myChildrenFragment" />
+
+        <action
+            android:id="@+id/action_patientDashboardFragment_to_myRecordFragment"
+            app:destination="@id/myRecordFragment" />
+
+        <action
+            android:id="@+id/action_patientDashboardFragment_to_patientAlertsFragment"
+            app:destination="@id/patientAlertsFragment" />
+
+        <action
+            android:id="@+id/action_patientDashboardFragment_to_patientConsultationsFragment"
+            app:destination="@id/patientConsultationsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/myChildrenFragment"
+        android:name="com.example.mobicare.myChildrenFragment"
+        android:label="My Children"
+        tools:layout="@layout/fragment_my_children">
+
+        <action
+            android:id="@+id/action_myChildrenFragment_to_childProfileFragment"
+            app:destination="@id/childProfileFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/childProfileFragment"
+        android:name="com.example.mobicare.childProfileFragment"
+        android:label="Child Profile"
+        tools:layout="@layout/fragment_child_profile">
+
+        <action
+            android:id="@+id/action_childProfileFragment_to_healthRecordsFragment"
+            app:destination="@id/healthRecordsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/healthRecordsFragment"
+        android:name="com.example.mobicare.healthRecordsFragment"
+        android:label="Health Records"
+        tools:layout="@layout/fragment_health_records" />
+
+    <fragment
+        android:id="@+id/myRecordFragment"
+        android:name="com.example.mobicare.myRecordFragment"
+        android:label="My Record"
+        tools:layout="@layout/fragment_my_record" />
+
+    <fragment
+        android:id="@+id/patientAlertsFragment"
+        android:name="com.example.mobicare.patientAlertsFragment"
+        android:label="My Alerts"
+        tools:layout="@layout/fragment_patient_alerts" />
+
+
+    <fragment
+        android:id="@+id/patientConsultationsFragment"
+        android:name="com.example.mobicare.patientConsultationsFragment"
+        android:label="My Consultations"
+        tools:layout="@layout/fragment_patient_consultations" />
+
+    <action
+        android:id="@+id/action_patientDashboardFragment_to_patientProfileFragment"
+        app:destination="@id/patientProfileFragment" />
+    <fragment
+        android:id="@+id/patientProfileFragment"
+        android:name="com.example.mobicare.patientProfileFragment"
+        android:label="My Profile"
+        tools:layout="@layout/fragment_patient_profile">
+
+        <action
+            android:id="@+id/action_patientProfileFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

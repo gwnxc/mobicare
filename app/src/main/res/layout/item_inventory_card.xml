@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:layout_marginHorizontal="4dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/ivItemIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/circle_light_blue"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_manage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/trust_blue" />
+
+        <TextView
+            android:id="@+id/tvItemName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="Item Name"
+            android:textColor="@color/slate_navy"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/btnEdit"
+            app:layout_constraintStart_toEndOf="@+id/ivItemIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvItemType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/badge_blue_light"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            android:text="Vaccine"
+            android:textColor="#2D79D1"
+            android:textSize="10sp"
+            app:layout_constraintStart_toStartOf="@+id/tvItemName"
+            app:layout_constraintTop_toBottomOf="@+id/tvItemName" />
+
+        <TextView
+            android:id="@+id/tvQuantity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="📦 Stock: 50"
+            android:textColor="@color/slate_navy"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/tvItemName"
+            app:layout_constraintStart_toStartOf="@+id/tvItemName"
+            app:layout_constraintTop_toBottomOf="@+id/tvItemType" />
+
+        <TextView
+            android:id="@+id/tvExpiry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="⏳ Expires: 12/2026"
+            android:textColor="@color/cool_grey"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/tvItemName"
+            app:layout_constraintStart_toStartOf="@+id/tvItemName"
+            app:layout_constraintTop_toBottomOf="@+id/tvQuantity" />
+
+        <ImageView
+            android:id="@+id/btnEdit"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/circle_light_blue"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/trust_blue" />
+
+        <ImageView
+            android:id="@+id/btnDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/badge_gray_light"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnEdit"
+            app:tint="#F44336" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

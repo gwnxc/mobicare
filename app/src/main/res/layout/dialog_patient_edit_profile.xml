@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update Profile"
+        android:textColor="#1E293B"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full Name"
+        android:textColor="#1E293B"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp"/>
+    <EditText
+        android:id="@+id/etEditName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#E2E8F0"
+        android:paddingHorizontal="16dp"
+        android:textColor="#1E293B"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phone Number"
+        android:textColor="#1E293B"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp"/>
+    <EditText
+        android:id="@+id/etEditPhone"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:inputType="phone"
+        android:background="#E2E8F0"
+        android:paddingHorizontal="16dp"
+        android:textColor="#1E293B"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Address"
+        android:textColor="#1E293B"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp"/>
+    <EditText
+        android:id="@+id/etEditAddress"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#E2E8F0"
+        android:paddingHorizontal="16dp"
+        android:textColor="#1E293B"
+        android:layout_marginBottom="24dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp"
+            android:text="Cancel"
+            android:textColor="#94A3B8"
+            app:backgroundTint="#F1F5F9"
+            app:cornerRadius="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="50dp"
+            android:text="Save"
+            android:textColor="@android:color/white"
+            app:backgroundTint="#4CAF50"
+            app:cornerRadius="8dp"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+</LinearLayout>
