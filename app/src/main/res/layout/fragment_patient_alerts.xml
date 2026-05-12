@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -8,27 +6,17 @@
     android:background="#F8F9FA">
 
     <View
-        android:id="@+id/headerBackground"
         android:id="@+id/headerView"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:background="@drawable/header_rounded_bottom"
-        android:layout_height="120dp"
-        android:background="@color/trust_blue"
+        android:layout_height="100dp"
+        android:background="#388E3C"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/btnBackConsultations"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
         android:id="@+id/btnBack"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:padding="8dp"
-        android:src="@drawable/ic_back_white"
-        android:contentDescription="Back"
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,41 +27,30 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
-        android:text="Consultations"
-        android:textStyle="bold"
+        android:text="Notifications"
         android:textColor="@color/pure_white"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBackConsultations" />
         app:layout_constraintTop_toBottomOf="@+id/btnBack" />
 
     <TextView
-        android:id="@+id/tvSubtitle"
+        android:id="@+id/tvUnreadCountLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:text="Schedule and History"
-        android:textColor="#E0E0E0"
-        android:text="Schedule and history"
-        android:textColor="#D1E3FF"
+        android:text="0 unread notifications"
+        android:textColor="#C8E6C9"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tvTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvConsultations"
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:padding="12dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerBackground" />
         app:layout_constraintTop_toBottomOf="@+id/headerView">
 
         <LinearLayout
@@ -83,39 +60,49 @@
             android:padding="20dp">
 
             <TextView
-                android:id="@+id/tvUpcomingCount"
+                android:id="@+id/tvEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:text="You have no notifications yet."
+                android:textColor="#94A3B8"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvNewLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Upcoming (0)"
-                android:textColor="@color/slate_navy"
+                android:layout_marginBottom="12dp"
+                android:text="New"
+                android:textColor="#1E293B"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"/>
+                android:textStyle="bold" />
 
             <LinearLayout
-                android:id="@+id/llUpcoming"
+                android:id="@+id/llNewNotifs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/tvCompletedCount"
+                android:id="@+id/tvEarlierLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Completed (0)"
-                android:textColor="@color/slate_navy"
-                android:textSize="16sp"
-                android:textStyle="bold"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="12dp"
+                android:text="Earlier"
+                android:textColor="#1E293B"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <LinearLayout
-                android:id="@+id/llCompleted"
+                android:id="@+id/llEarlierNotifs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

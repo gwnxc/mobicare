@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services") // Add this line here
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -43,6 +44,11 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.gridlayout)
 
+    implementation(libs.firebase.database)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -53,4 +59,6 @@ dependencies {
     // 2. Add Firebase dependencies WITHOUT versions (BoM handles it)
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
+    implementation("com.itextpdf:itextg:5.5.10")
+    implementation("com.google.firebase:firebase-auth")
 }

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E2E8F0"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/circle_white"
+                android:backgroundTint="#E0F2F1"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                app:tint="#00796B" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="Prenatal Checkup"
+                android:textColor="#1E293B"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvPreDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/badge_green_light"
+                android:backgroundTint="#E0F2F1"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="2023-01-15"
+                android:textColor="#00796B"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/bg_stat_box" android:orientation="vertical" android:padding="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Blood Pressure" android:textColor="#94A3B8" android:textSize="11sp" />
+                <TextView android:id="@+id/tvPreBP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="115/75" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/bg_stat_box" android:orientation="vertical" android:padding="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weight" android:textColor="#94A3B8" android:textSize="11sp" />
+                <TextView android:id="@+id/tvPreWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="58 kg" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/bg_stat_box" android:orientation="vertical" android:padding="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fundal Height (FH)" android:textColor="#94A3B8" android:textSize="11sp" />
+                <TextView android:id="@+id/tvPreFH" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="12 cm" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/bg_stat_box" android:orientation="vertical" android:padding="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fetal Heart Tone (FHT)" android:textColor="#94A3B8" android:textSize="11sp" />
+                <TextView android:id="@+id/tvPreFHT" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="145 bpm" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView android:id="@+id/tvPreTT" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="TT Given: TT1" android:textColor="#475569" android:textSize="13sp" />
+        <TextView android:id="@+id/tvPreDiagnosis" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Diagnosis/Treatment: Patient is doing well." android:textColor="#475569" android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_today" app:tint="#00897B" />
+            <TextView android:id="@+id/tvPreReturn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="Return check-up: 2023-02-15" android:textColor="#00897B" android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
