@@ -83,7 +83,7 @@ public class patientProfileFragment extends Fragment {
             btnLogout.setOnClickListener(v -> {
                 FirebaseAuth.getInstance().signOut();
                 requireActivity().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE).edit().clear().apply();
-                Navigation.findNavController(view).navigate(R.id.action_patientProfileFragment_to_loginFragment);
+                Navigation.findNavController(view).navigate(R.id.loginFragment);
             });
         }
 

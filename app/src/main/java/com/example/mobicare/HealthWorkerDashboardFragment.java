@@ -52,7 +52,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
     private ImageView btnLogout;
     private View slot1, slot2, slot3;
 
-    private DatabaseReference mDatabase;
     private LinearLayout llWorkerList;
     private TextView tvCount;
 
@@ -63,17 +62,65 @@ public class HealthWorkerDashboardFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // NOTE: Make sure this matches your actual XML layout file name for this screen!
-        // If your layout is named fragment_health_worker_dashboard, change it here:
-        return inflater.inflate(R.layout.fragment_health_worker_management, container, false);
+        // We initialize Firebase early to check data
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        // Logic: You can determine which XML to inflate here.
+        // For now, I'll keep your management layout as requested.
+        return inflater.inflate(R.layout.fragment_health_worker_dashboard, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
+        currentUid = prefs.getString("loggedUserKey", "");
+
         // Point to the Users node in Firebase
         mDatabase = FirebaseDatabase.getInstance().getReference("Users");
+        // 1. Initialize Views
+        tvChildrenCount = view.findViewById(R.id.tvChildrenCountDashboard);
+        tvMotherCount = view.findViewById(R.id.tvMotherCountDashboard);
+        tvUpcomingCount = view.findViewById(R.id.tvUpcomingCountDashboard);
+
+        btnLogout = view.findViewById(R.id.btnLogout);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        // 2. Initialize Activity Slots
+        slot1 = view.findViewById(R.id.activity1);
+        slot2 = view.findViewById(R.id.activity2);
+        slot3 = view.findViewById(R.id.activity3);
+
+        // Hide slots by default until data arrives
+        // Safe version: Only set visibility if the view was actually found
+        if (slot1 != null) slot1.setVisibility(View.GONE);
+        if (slot2 != null) slot2.setVisibility(View.GONE);
+        if (slot3 != null) slot3.setVisibility(View.GONE);
+
+        // Profile navigation
+        ImageView ivProfile = view.findViewById(R.id.ivProfile);
+        if (ivProfile != null) {
+            ivProfile.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.profileFragment));
+        }
+        // --- QUICK ACTION CARD LISTENERS ---
+        view.findViewById(R.id.cvRegisterPatient).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.registrationHubFragment));
+
+        view.findViewById(R.id.cvAddRecord).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.addConsultationFragment));
+
+        view.findViewById(R.id.cvConsultations).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.consultationsFragment));
+
+        view.findViewById(R.id.cvViewRecords).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.viewRecordsFragment));
+
+        view.findViewById(R.id.cvNotifications).setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.alertsFragment));
+
+        btnLogout.setOnClickListener(v -> showLogoutConfirmation());
+
 
         // Link to UI Elements
         llWorkerList = view.findViewById(R.id.llWorkerList);
@@ -91,8 +138,13 @@ public class HealthWorkerDashboardFragment extends Fragment {
             btnAddWorker.setOnClickListener(v -> showAddWorkerDialog());
         }
 
-        // 3. Start fetching data from Firebase
+        // 3. Initialize Data Loaders
         fetchHealthWorkers();
+        fetchDashboardStats();
+        fetchHealthWorkerProfile();
+        listenForNotifications();
+        listenForRecentActivities();
+
     }
 
     private void showAddWorkerDialog() {
@@ -259,60 +311,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
         if (llWorkerList != null) {
             llWorkerList.addView(card);
         }
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
-        currentUid = prefs.getString("loggedUserKey", "");
-
-        // 1. Initialize Views
-        tvChildrenCount = view.findViewById(R.id.tvChildrenCountDashboard);
-        tvMotherCount = view.findViewById(R.id.tvMotherCountDashboard);
-        tvUpcomingCount = view.findViewById(R.id.tvUpcomingCountDashboard);
-
-        btnLogout = view.findViewById(R.id.btnLogout);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        // 2. Initialize Activity Slots
-        slot1 = view.findViewById(R.id.activity1);
-        slot2 = view.findViewById(R.id.activity2);
-        slot3 = view.findViewById(R.id.activity3);
-
-        // Hide slots by default until data arrives
-        slot1.setVisibility(View.GONE);
-        slot2.setVisibility(View.GONE);
-        slot3.setVisibility(View.GONE);
-
-        // Profile navigation
-        ImageView ivProfile = view.findViewById(R.id.ivProfile);
-        ivProfile.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.profileFragment));
-
-        // --- QUICK ACTION CARD LISTENERS ---
-        view.findViewById(R.id.cvRegisterPatient).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.registrationHubFragment));
-
-        view.findViewById(R.id.cvAddRecord).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.addConsultationFragment));
-
-        view.findViewById(R.id.cvConsultations).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.consultationsFragment));
-
-        view.findViewById(R.id.cvViewRecords).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.viewRecordsFragment));
-
-        view.findViewById(R.id.cvNotifications).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.alertsFragment));
-
-        btnLogout.setOnClickListener(v -> showLogoutConfirmation());
-
-        // 3. Initialize Data Loaders
-        fetchDashboardStats();
-        fetchHealthWorkerProfile();
-        listenForNotifications();
-        listenForRecentActivities();
     }
 
     private void listenForRecentActivities() {
