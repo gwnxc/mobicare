@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "497932824247",
+    "project_id": "mobicare-ef0fa",
+    "storage_bucket": "mobicare-ef0fa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497932824247:android:b06332af3380c9f112e732",
+        "android_client_info": {
+          "package_name": "com.example.mobicare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDR-ivabETFNZb8f_qHFk54ZJ4BiUUx4AQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
