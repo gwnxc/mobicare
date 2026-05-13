@@ -4,17 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/trust_blue"
+    android:background="@drawable/bg_login_gradient"
     tools:context=".LoginFragment">
 
     <ImageView
         android:id="@+id/ivLogo"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginTop="48dp"
-        android:background="@drawable/circle_white"
-        android:padding="16dp"
-        android:src="@android:drawable/ic_menu_gallery"
+        android:background="@drawable/bg_white_circle"
+        android:padding="22dp"
+        android:src="@drawable/ic_app_logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,10 +24,10 @@
         android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Welcome Back"
+        android:layout_marginTop="24dp"
+        android:text="Welcome to Mobicare"
         android:textColor="@color/pure_white"
-        android:textSize="28sp"
+        android:textSize="32sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,17 +45,18 @@
         app:layout_constraintTop_toBottomOf="@+id/tvWelcome" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cvLogin"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        app:cardCornerRadius="32dp"
-        app:cardElevation="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="8dp"
         app:layout_constraintTop_toBottomOf="@+id/tvSubtitle">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:fillViewport="true">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -69,6 +70,7 @@
                     android:layout_height="wrap_content"
                     android:text="Select Role"
                     android:textColor="@color/slate_navy"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -79,8 +81,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     app:layout_constraintTop_toBottomOf="@+id/labelRole"
-                    app:singleSelection="true"
-                    app:selectionRequired="true">
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
 
                     <Button
                         android:id="@+id/btnHealthWorker"
@@ -90,7 +92,7 @@
                         android:layout_weight="1"
                         android:text="Health\nWorker"
                         android:textAllCaps="false"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
 
                     <Button
                         android:id="@+id/btnMother"
@@ -98,9 +100,9 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Patient"
+                        android:text="Parent/\nGuardian"
                         android:textAllCaps="false"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
 
                     <Button
                         android:id="@+id/btnAdmin"
@@ -110,7 +112,7 @@
                         android:layout_weight="1"
                         android:text="Admin"
                         android:textAllCaps="false"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 <TextView
@@ -118,7 +120,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="Username / Email"
+                    android:text="Username"
                     android:textColor="@color/slate_navy"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -131,14 +133,16 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     app:boxBackgroundColor="#F5F5F5"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusTopStart="16dp"
                     app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
                     app:hintEnabled="false"
                     app:layout_constraintTop_toBottomOf="@+id/labelUsername"
-                    app:startIconDrawable="@android:drawable/ic_menu_myplaces">
+                    app:startIconDrawable="@drawable/ic_user"
+                    app:startIconTint="@color/slate_navy">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etUsername"
@@ -166,15 +170,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     app:boxBackgroundColor="#F5F5F5"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusTopStart="16dp"
                     app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
                     app:endIconMode="password_toggle"
                     app:hintEnabled="false"
                     app:layout_constraintTop_toBottomOf="@+id/labelPassword"
-                    app:startIconDrawable="@android:drawable/ic_lock_idle_lock">
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:startIconTint="@color/slate_navy">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPassword"
@@ -187,13 +193,13 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLogin"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="56dp"
                     android:layout_marginTop="32dp"
                     android:backgroundTint="@color/trust_blue"
                     android:text="Sign In"
                     android:textAllCaps="false"
-                    android:textColor="@color/pure_white"
-                    app:cornerRadius="12dp"
+                    android:textSize="16sp"
+                    app:cornerRadius="16dp"
                     app:layout_constraintTop_toBottomOf="@+id/tilPassword" />
 
                 <TextView

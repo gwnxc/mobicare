@@ -67,9 +67,10 @@ public class adminDashboardFragment extends Fragment {
 
         if (navHome != null) navHome.setOnClickListener(v -> {});
 
-        if (navInventory != null) navInventory.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_inventoryFragment));
+        // FIXED ID: Matches your nav_graph.xml line 85
+        if (navInventory != null) navInventory.setOnClickListener(v ->
+                Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_inventoryFragment));
 
-        // Hide the badge when the Alerts button is clicked and save to SharedPreferences
         if (navAlerts != null) navAlerts.setOnClickListener(v -> {
             if (getActivity() != null) {
                 SharedPreferences prefs = requireActivity().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE);
@@ -77,28 +78,37 @@ public class adminDashboardFragment extends Fragment {
             }
             TextView tvBottomAlertBadge = view.findViewById(R.id.tvBottomAlertBadge);
             if (tvBottomAlertBadge != null) tvBottomAlertBadge.setVisibility(View.GONE);
+
+            // FIXED ID: Matches your nav_graph.xml line 87
             Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_alertsFragment);
         });
 
-        if (navProfile != null) navProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_profileFragment));
+        // FIXED ID: Matches your nav_graph.xml line 89
+        if (navProfile != null) navProfile.setOnClickListener(v ->
+                Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_profileFragment));
 
         // --- Quick Actions Logic ---
         MaterialCardView cvHealthWorkers = view.findViewById(R.id.cvHealthWorkers);
-        if (cvHealthWorkers != null) cvHealthWorkers.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_healthWorkerManagementFragment));
+        if (cvHealthWorkers != null) cvHealthWorkers.setOnClickListener(v ->
+                Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_healthWorkerManagementFragment)); // Matches line 77
 
         MaterialCardView cvRegisterPatient = view.findViewById(R.id.cvRegisterPatient);
-        if (cvRegisterPatient != null) cvRegisterPatient.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_registerPatientFragment));
+        if (cvRegisterPatient != null) cvRegisterPatient.setOnClickListener(v ->
+                Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_registerPatientFragment)); // Matches line 79
 
         MaterialCardView cvViewMothers = view.findViewById(R.id.cvViewMothers);
-        if (cvViewMothers != null) cvViewMothers.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_viewMothersFragment));
+        if (cvViewMothers != null) cvViewMothers.setOnClickListener(v ->
+                Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_viewMothersFragment)); // Matches line 83
 
         MaterialCardView cvConsultations = view.findViewById(R.id.cvConsultations);
-        if (cvConsultations != null) cvConsultations.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_consultationsFragment));
+        if (cvConsultations != null) cvConsultations.setOnClickListener(v ->
+                Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_consultationsFragment)); // Matches line 81
 
         MaterialCardView cvInventoryCard = view.findViewById(R.id.cvInventory);
         if (cvInventoryCard != null) cvInventoryCard.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putBoolean("showBottomNav", false);
+            // FIXED ID: Matches line 85
             Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_inventoryFragment, bundle);
         });
 

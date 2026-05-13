@@ -3,23 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/trust_blue">
+    android:background="@drawable/bg_login_gradient">
 
+    <!-- Official App Icon Container -->
     <ImageView
         android:id="@+id/ivLogo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:src="@android:drawable/ic_menu_gallery"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:background="@drawable/bg_white_circle"
+        android:padding="25dp"
+        android:src="@drawable/ic_app_logo"
+        app:tint="@color/trust_blue"
+        android:tintMode="src_in"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/pure_white" />
+        app:layout_constraintVertical_bias="0.42" />
 
     <TextView
+        android:id="@+id/tvMainTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:text="MCHMS Mobile"
         android:textColor="@color/pure_white"
         android:textSize="32sp"
@@ -28,10 +35,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivLogo" />
 
-    <ProgressBar
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
+        android:layout_marginTop="4dp"
+        android:text="Maternal &amp; Child Health Management"
+        android:textColor="@color/pure_white"
+        android:textSize="14sp"
+        android:alpha="0.9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvMainTitle" />
+
+    <ProgressBar
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="60dp"
         android:indeterminateTint="@color/pure_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

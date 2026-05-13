@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/ivConsultationIcon"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/circle_light_blue"
+            android:padding="10dp"
+            android:src="@drawable/ic_consultation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/trust_blue" />
+
+        <TextView
+            android:id="@+id/tvConsultationName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Patient Name"
+            android:textStyle="bold"
+            android:textColor="@color/slate_navy"
+            android:textSize="16sp"
+
+            app:layout_constraintStart_toEndOf="@+id/ivConsultationIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvConsultationReason"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reason for visit"
+            android:textColor="@color/slate_navy"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="@+id/tvConsultationName"
+            app:layout_constraintTop_toBottomOf="@+id/tvConsultationName" />
+
+        <TextView
+            android:id="@+id/tvConsultationDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:drawablePadding="4dp"
+            android:text="2026-01-25"
+            android:textColor="@color/soft_teal"
+            android:textSize="12sp"
+            app:drawableStartCompat="@drawable/ic_consultation"
+            app:drawableTint="@color/soft_teal"
+            app:layout_constraintStart_toStartOf="@+id/tvConsultationName"
+            app:layout_constraintTop_toBottomOf="@+id/tvConsultationReason" />
+
+        <TextView
+            android:id="@+id/tvConsultationTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:drawablePadding="4dp"
+            android:text="10:00 AM"
+            android:textColor="@color/soft_teal"
+            android:textSize="12sp"
+            app:drawableStartCompat="@drawable/ic_time"
+            app:drawableTint="@color/soft_teal"
+            app:layout_constraintBottom_toBottomOf="@+id/tvConsultationDate"
+            app:layout_constraintStart_toEndOf="@+id/tvConsultationDate"
+            app:layout_constraintTop_toTopOf="@+id/tvConsultationDate" />
+
+        <TextView
+            android:id="@+id/tvConsultationStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/badge_blue"
+            android:paddingStart="12dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="4dp"
+            android:text="scheduled"
+            android:textColor="@color/trust_blue"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

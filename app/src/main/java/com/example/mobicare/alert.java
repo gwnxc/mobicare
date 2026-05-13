@@ -258,9 +258,10 @@ public class alert extends Fragment {
         LinearLayout navInventory = view.findViewById(R.id.nav_inventory);
         LinearLayout navProfile = view.findViewById(R.id.nav_profile);
 
-        if (navHome != null) navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_alertsFragment_to_adminDashboardFragment));
-        if (navInventory != null) navInventory.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_alertsFragment_to_inventoryFragment));
-        if (navProfile != null) navProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_alertsFragment_to_profileFragment));
+// SYNCED ACTIONS: Ensuring these match the IDs in nav_graph.xml
+        if (navHome != null) navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_inventoryFragment)); // Use global action or correct ID
+        if (navInventory != null) navInventory.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_inventoryFragment));
+        if (navProfile != null) navProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_profileFragment));
     }
 
     class NotificationItem {

@@ -1,13 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.gms.google.services)
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.example.mobicare"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36 // Cleaned up the version syntax here
 
     defaultConfig {
         applicationId = "com.example.mobicare"
@@ -42,14 +40,22 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.gridlayout)
-    implementation(libs.firebase.database)
-    implementation(libs.credentials)
-    implementation(libs.credentials.play.services.auth)
-    implementation(libs.googleid)
-    implementation(libs.firebase.auth)
+
+    // Firebase BoM (Bill of Materials) - This is the best way to handle versions
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+
+    // Firebase dependencies (Versions are handled by BoM)
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+
+    // Other Libraries
+    implementation("com.itextpdf:itextg:5.5.10")
+    // Replace the problematic "libs" lines with these direct versions:
+    implementation("androidx.credentials:credentials:1.2.2")
+    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation("com.itextpdf:itextg:5.5.10")
-    implementation("com.google.firebase:firebase-auth")
 }

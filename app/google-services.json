@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "497932824247",
+    "firebase_url": "https://mobicare-ef0fa-default-rtdb.firebaseio.com",
     "project_id": "mobicare-ef0fa",
     "storage_bucket": "mobicare-ef0fa.firebasestorage.app"
   },
