@@ -9,15 +9,15 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavHealthWorker">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="80dp"> <!-- Extra padding so bottom content isn't hidden by nav bar -->
+            android:layout_height="wrap_content">
 
-            <!-- Blue Header Section -->
             <View
                 android:id="@+id/headerBackground"
                 android:layout_width="match_parent"
@@ -48,7 +48,6 @@
                 app:layout_constraintStart_toStartOf="@+id/tvWelcomeBack"
                 app:layout_constraintTop_toBottomOf="@+id/tvWelcomeBack" />
 
-            <!-- Header Action Icons -->
             <ImageView
                 android:id="@+id/btnLogout"
                 android:layout_width="44dp"
@@ -78,7 +77,6 @@
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
-            <!-- Summary Cards -->
             <LinearLayout
                 android:id="@+id/llSummary"
                 android:layout_width="match_parent"
@@ -206,7 +204,6 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Quick Actions Section -->
             <TextView
                 android:id="@+id/tvQuickActionsLabel"
                 android:layout_width="wrap_content"
@@ -229,7 +226,6 @@
                 app:columnCount="2"
                 app:layout_constraintTop_toBottomOf="@+id/tvQuickActionsLabel">
 
-                <!-- Register Patient -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cvRegisterPatient"
                     android:layout_width="0dp"
@@ -271,7 +267,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- View Patient Records -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cvViewRecords"
                     android:layout_width="0dp"
@@ -312,7 +307,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Add Record -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cvAddRecord"
                     android:layout_width="0dp"
@@ -351,7 +345,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Consultations -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cvConsultations"
                     android:layout_width="0dp"
@@ -390,7 +383,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Notifications -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cvNotifications"
                     android:layout_width="0dp"
@@ -450,7 +442,6 @@
                 </com.google.android.material.card.MaterialCardView>
             </androidx.gridlayout.widget.GridLayout>
 
-            <!-- Recent Activity Section -->
             <TextView
                 android:id="@+id/tvRecentActivityLabel"
                 android:layout_width="wrap_content"
@@ -489,5 +480,17 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavHealthWorker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        app:itemIconTint="@color/slate_navy"
+        app:itemTextColor="@color/slate_navy"
+        app:menu="@menu/bottom_nav_menu"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

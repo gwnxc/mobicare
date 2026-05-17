@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -52,23 +50,35 @@ public class patientProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        SharedPreferences prefs = requireActivity().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE);
-        loggedInUserId = prefs.getString("loggedInUser", null);
+        // ---> ROBUST LOGIN CHECK: Tries both spellings to prevent getting stuck on "Loading..." <---
+        SharedPreferences prefs = requireActivity().getSharedPreferences("MobiCarePrefs", Context.MODE_PRIVATE);
+        loggedInUserId = prefs.getString("loggedUserKey", null);
 
-        ImageView btnBack = view.findViewById(R.id.btnBack);
+        if (loggedInUserId == null || loggedInUserId.isEmpty()) {
+            SharedPreferences altPrefs = requireActivity().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE);
+            loggedInUserId = altPrefs.getString("loggedInUser", null);
+        }
+
+        if (loggedInUserId == null || loggedInUserId.isEmpty()) {
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                loggedInUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            }
+        }
+
+        // Initialize UI Elements
+        View btnBack = view.findViewById(R.id.btnBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> Navigation.findNavController(view).navigateUp());
 
-        // Initialize TextViews
-        tvProfileName = view.findViewById(R.id.tvProfileName);
-        tvProfileRole = view.findViewById(R.id.tvProfileRole);
-        tvProfilePhone = view.findViewById(R.id.tvProfilePhone);
-        tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
-        tvProfileAddress = view.findViewById(R.id.tvProfileAddress);
+        tvProfileName = view.findViewById(R.id.tvPatientName);
+        tvProfileRole = view.findViewById(R.id.tvPatientID);
+        tvProfilePhone = view.findViewById(R.id.tvPatientGuardian);
+        tvProfileEmail = view.findViewById(R.id.tvPatientDOB);
+        tvProfileAddress = view.findViewById(R.id.tvPatientAddress);
 
-        // Action Buttons
-        MaterialButton btnEditProfile = view.findViewById(R.id.btnEditProfile);
-        MaterialButton btnChangePassword = view.findViewById(R.id.btnChangePassword);
-        MaterialButton btnLogout = view.findViewById(R.id.btnLogout);
+        // ---> BULLETPROOF UI: Using 'View' ensures this never throws a ClassCastException <---
+        View btnEditProfile = view.findViewById(R.id.btnEditProfile);
+        View btnChangePassword = view.findViewById(R.id.btnChangePassword);
+        View btnLogout = view.findViewById(R.id.btnLogout);
 
         // ---> LAUNCH POP-UPS <---
         if (btnEditProfile != null) {
@@ -83,6 +93,7 @@ public class patientProfileFragment extends Fragment {
             btnLogout.setOnClickListener(v -> {
                 FirebaseAuth.getInstance().signOut();
                 requireActivity().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE).edit().clear().apply();
+                requireActivity().getSharedPreferences("MobiCarePrefs", Context.MODE_PRIVATE).edit().clear().apply();
                 Navigation.findNavController(view).navigate(R.id.loginFragment);
             });
         }
@@ -96,8 +107,10 @@ public class patientProfileFragment extends Fragment {
         if (navAlerts != null) navAlerts.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.patientAlertsFragment));
         if (navProfile != null) navProfile.setOnClickListener(v -> {}); // Already here
 
-        if (loggedInUserId != null) {
+        if (loggedInUserId != null && !loggedInUserId.isEmpty()) {
             fetchPatientProfile();
+        } else {
+            Toast.makeText(getContext(), "Session error. Please log in again.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -115,11 +128,11 @@ public class patientProfileFragment extends Fragment {
                     String role = snapshot.child("role").getValue(String.class);
                     String email = snapshot.child("email").getValue(String.class);
 
-                    tvProfileName.setText(currentName != null ? currentName : "Unknown");
-                    tvProfileRole.setText(role != null ? role : "Parent/Guardian");
-                    tvProfilePhone.setText(currentPhone != null && !currentPhone.isEmpty() ? currentPhone : "Not provided");
-                    tvProfileEmail.setText(email != null && !email.isEmpty() ? email : "Not provided");
-                    tvProfileAddress.setText(currentAddress != null && !currentAddress.isEmpty() ? currentAddress : "Not provided");
+                    if (tvProfileName != null) tvProfileName.setText(currentName != null ? currentName : "Unknown");
+                    if (tvProfileRole != null) tvProfileRole.setText(role != null ? role : "Parent/Guardian");
+                    if (tvProfilePhone != null) tvProfilePhone.setText(currentPhone != null && !currentPhone.isEmpty() ? currentPhone : "Not provided");
+                    if (tvProfileEmail != null) tvProfileEmail.setText(email != null && !email.isEmpty() ? email : "Not provided");
+                    if (tvProfileAddress != null) tvProfileAddress.setText(currentAddress != null && !currentAddress.isEmpty() ? currentAddress : "Not provided");
                 }
             }
             @Override public void onCancelled(@NonNull DatabaseError error) {}
@@ -134,7 +147,6 @@ public class patientProfileFragment extends Fragment {
 
         AlertDialog dialog = builder.create();
 
-
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
@@ -142,43 +154,46 @@ public class patientProfileFragment extends Fragment {
         EditText etName = dialogView.findViewById(R.id.etEditName);
         EditText etPhone = dialogView.findViewById(R.id.etEditPhone);
         EditText etAddress = dialogView.findViewById(R.id.etEditAddress);
-        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancel);
-        MaterialButton btnSave = dialogView.findViewById(R.id.btnSave);
+
+        // ---> BULLETPROOF FIX: Using 'View' for popup buttons <---
+        View btnCancel = dialogView.findViewById(R.id.btnCancel);
+        View btnSave = dialogView.findViewById(R.id.btnSave);
 
         // Pre-fill current data
-        etName.setText(currentName);
-        etPhone.setText(currentPhone);
-        etAddress.setText(currentAddress);
+        if(etName != null) etName.setText(currentName);
+        if(etPhone != null) etPhone.setText(currentPhone);
+        if(etAddress != null) etAddress.setText(currentAddress);
 
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        if(btnCancel != null) btnCancel.setOnClickListener(v -> dialog.dismiss());
 
-        btnSave.setOnClickListener(v -> {
-            String newName = etName.getText().toString().trim();
-            String newPhone = etPhone.getText().toString().trim();
-            String newAddress = etAddress.getText().toString().trim();
+        if(btnSave != null) {
+            btnSave.setOnClickListener(v -> {
+                String newName = etName.getText().toString().trim();
+                String newPhone = etPhone.getText().toString().trim();
+                String newAddress = etAddress.getText().toString().trim();
 
-            if (newName.isEmpty()) {
-                etName.setError("Name is required");
-                return;
-            }
-
-            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Patients_Guardians").child(loggedInUserId);
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("fullName", newName);
-            updates.put("phone", newPhone);
-            updates.put("address", newAddress);
-
-            userRef.updateChildren(updates).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(getContext(), "Profile updated!", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                    fetchPatientProfile(); // Refresh the screen with new data!
-                } else {
-                    Toast.makeText(getContext(), "Update failed.", Toast.LENGTH_SHORT).show();
+                if (newName.isEmpty()) {
+                    etName.setError("Name is required");
+                    return;
                 }
-            });
-        });
 
+                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Patients_Guardians").child(loggedInUserId);
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("fullName", newName);
+                updates.put("phone", newPhone);
+                updates.put("address", newAddress);
+
+                userRef.updateChildren(updates).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(), "Profile updated!", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        fetchPatientProfile(); // Refresh the screen with new data!
+                    } else {
+                        Toast.makeText(getContext(), "Update failed.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        }
         dialog.show();
     }
 
@@ -196,39 +211,42 @@ public class patientProfileFragment extends Fragment {
 
         EditText etNewPassword = dialogView.findViewById(R.id.etNewPassword);
         EditText etConfirmPassword = dialogView.findViewById(R.id.etConfirmPassword);
-        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancel);
-        MaterialButton btnUpdate = dialogView.findViewById(R.id.btnUpdate);
 
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        // ---> BULLETPROOF FIX: Using 'View' for popup buttons <---
+        View btnCancel = dialogView.findViewById(R.id.btnCancel);
+        View btnUpdate = dialogView.findViewById(R.id.btnUpdate);
 
-        btnUpdate.setOnClickListener(v -> {
-            String newPass = etNewPassword.getText().toString().trim();
-            String confirmPass = etConfirmPassword.getText().toString().trim();
+        if(btnCancel != null) btnCancel.setOnClickListener(v -> dialog.dismiss());
 
-            if (newPass.length() < 6) {
-                etNewPassword.setError("Minimum 6 characters");
-                return;
-            }
-            if (!newPass.equals(confirmPass)) {
-                etConfirmPassword.setError("Passwords do not match");
-                return;
-            }
+        if(btnUpdate != null) {
+            btnUpdate.setOnClickListener(v -> {
+                String newPass = etNewPassword.getText().toString().trim();
+                String confirmPass = etConfirmPassword.getText().toString().trim();
 
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null) {
-                user.updatePassword(newPass).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "Password updated successfully!", Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(getContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
-            } else {
-                Toast.makeText(getContext(), "Not authenticated. Please log in again.", Toast.LENGTH_SHORT).show();
-            }
-        });
+                if (newPass.length() < 6) {
+                    etNewPassword.setError("Minimum 6 characters");
+                    return;
+                }
+                if (!newPass.equals(confirmPass)) {
+                    etConfirmPassword.setError("Passwords do not match");
+                    return;
+                }
 
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    user.updatePassword(newPass).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getContext(), "Password updated successfully!", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        } else {
+                            Toast.makeText(getContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(getContext(), "Not authenticated. Please log in again.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
         dialog.show();
     }
 }

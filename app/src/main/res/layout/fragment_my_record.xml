@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA">
 
     <View
         android:id="@+id/headerView"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_width="411dp"
+        android:layout_height="125dp"
+        android:layout_marginTop="4dp"
         android:background="#388E3C"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
 
     <ImageView
         android:id="@+id/btnBack"
@@ -29,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
-        android:text="Health Records"
+        android:text="testung"
         android:textColor="@color/pure_white"
         android:textSize="22sp"
         android:textStyle="bold"
@@ -81,12 +84,32 @@
                 android:background="@drawable/bg_stat_box"
                 android:orientation="horizontal"
                 android:padding="4dp">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:background="@drawable/circle_white" android:gravity="center" android:paddingVertical="10dp" android:text="Prenatal" android:textColor="#00796B" android:textStyle="bold" />
 
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:paddingVertical="10dp" android:text="Medicines" android:textColor="#64748B" />
+                <TextView
+                    android:id="@+id/tabPrenatal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/circle_white"
+                    android:gravity="center"
+                    android:paddingVertical="10dp"
+                    android:text="Prenatal"
+                    android:textColor="#00796B"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tabMedicines"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingVertical="10dp"
+                    android:text="Medicines"
+                    android:textColor="#64748B" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/tvSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -112,7 +135,26 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
+            <TextView
+                android:id="@+id/tvEmptyStateMedicines"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="32dp"
+                android:gravity="center"
+                android:text="You currently have no medicine records."
+                android:textColor="#94A3B8"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/llMedicineRecords"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvInfoBottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -123,10 +165,10 @@
                 app:strokeWidth="1dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
                     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
-                        <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_info_details" app:tint="#00796B" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="Prenatal Care Importance" android:textColor="#00796B" android:textStyle="bold" />
+                        <ImageView android:id="@+id/ivInfoBottom" android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_info_details" app:tint="#00796B" />
+                        <TextView android:id="@+id/tvInfoTitleBottom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="Prenatal Care Importance" android:textColor="#00796B" android:textStyle="bold" />
                     </LinearLayout>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Regular prenatal checkups help monitor your baby's development and ensure a healthy pregnancy. Attend all scheduled visits for the best outcomes." android:textColor="#004D40" android:textSize="12sp" />
+                    <TextView android:id="@+id/tvInfoDescBottom" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Regular prenatal checkups help monitor your baby's development. Attend all scheduled visits." android:textColor="#004D40" android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

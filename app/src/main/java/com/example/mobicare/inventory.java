@@ -308,12 +308,40 @@ public class inventory extends Fragment {
 
     private void setupBottomNavigation(View view) {
         LinearLayout navHome = view.findViewById(R.id.nav_home);
+        LinearLayout navInventory = view.findViewById(R.id.nav_inventory);
         LinearLayout navAlerts = view.findViewById(R.id.nav_alerts);
         LinearLayout navProfile = view.findViewById(R.id.nav_profile);
 
-        if (navHome != null) navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_inventoryFragment_to_adminDashboardFragment));
-        if (navAlerts != null) navAlerts.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_inventoryFragment_to_alertsFragment));
-        if (navProfile != null) navProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_inventoryFragment_to_profileFragment));
+        // --- Make the Bottom Nav Visible & Highlight 'Inventory' ---
+        int activeColor = Color.parseColor("#155A91"); // Blue
+        int inactiveColor = Color.parseColor("#8E8E8E"); // Grey
+
+        if (navHome != null) {
+            ((ImageView) navHome.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navHome.getChildAt(1)).setTextColor(inactiveColor);
+            navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_inventoryFragment_to_adminDashboardFragment));
+        }
+
+        if (navInventory != null) {
+            ((ImageView) navInventory.getChildAt(0)).setColorFilter(activeColor);
+            ((TextView) navInventory.getChildAt(1)).setTextColor(activeColor);
+            navInventory.setOnClickListener(v -> {}); // Already on Inventory
+        }
+
+        if (navAlerts != null) {
+            View alertsIcon = ((android.widget.FrameLayout) navAlerts.getChildAt(0)).getChildAt(0);
+            if (alertsIcon instanceof ImageView) ((ImageView) alertsIcon).setColorFilter(inactiveColor);
+            ((TextView) navAlerts.getChildAt(1)).setTextColor(inactiveColor);
+            // FIXED ID: Uses unique Admin Alerts action
+            navAlerts.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_inventoryFragment_to_adminAlertsFragment));
+        }
+
+        if (navProfile != null) {
+            ((ImageView) navProfile.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navProfile.getChildAt(1)).setTextColor(inactiveColor);
+            // FIXED ID: Uses unique Admin Profile action
+            navProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_inventoryFragment_to_adminProfileFragment));
+        }
     }
 
     // Helper class to store data temporarily for filtering

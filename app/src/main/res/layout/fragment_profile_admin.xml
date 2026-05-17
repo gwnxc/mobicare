@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="12dp"
-                android:text="My Profile"
+                android:text="Admin Profile"
                 android:textColor="@color/pure_white"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -113,11 +113,11 @@
                             app:tint="@color/pure_white" />
 
                         <TextView
-                            android:id="@+id/tvPatientName"
+                            android:id="@+id/tvAdminName"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:text="Patient Name"
+                            android:text="System Administrator"
                             android:textColor="@color/slate_navy"
                             android:textSize="20sp"
                             android:textStyle="bold"
@@ -126,21 +126,21 @@
                             app:layout_constraintTop_toTopOf="@+id/ivProfilePic" />
 
                         <TextView
-                            android:id="@+id/tvPatientID"
+                            android:id="@+id/tvProfileSubtitleRole"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Patient Role"
+                            android:text="Admin Role"
                             android:textColor="#423F3F"
-                            app:layout_constraintStart_toStartOf="@+id/tvPatientName"
-                            app:layout_constraintTop_toBottomOf="@+id/tvPatientName" />
+                            app:layout_constraintStart_toStartOf="@+id/tvAdminName"
+                            app:layout_constraintTop_toBottomOf="@+id/tvAdminName" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            app:layout_constraintStart_toStartOf="@+id/tvPatientID"
-                            app:layout_constraintTop_toBottomOf="@+id/tvPatientID">
+                            app:layout_constraintStart_toStartOf="@+id/tvProfileSubtitleRole"
+                            app:layout_constraintTop_toBottomOf="@+id/tvProfileSubtitleRole">
 
                             <View
                                 android:layout_width="8dp"
@@ -157,13 +157,11 @@
                         </LinearLayout>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginBottom="16dp" android:background="#E0E0E0" />
-
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:layout_marginBottom="16dp">
                         <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/circle_light_blue" android:padding="8dp" android:src="@android:drawable/ic_menu_call" app:tint="@color/trust_blue" />
                         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:orientation="vertical">
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Phone Number" android:textColor="@color/cool_grey" android:textSize="12sp" />
-                            <TextView android:id="@+id/tvPatientGuardian" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textColor="@color/slate_navy" android:textSize="14sp" android:textStyle="bold" />
+                            <TextView android:id="@+id/tvAdminPhone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textColor="@color/slate_navy" android:textSize="14sp" android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -171,22 +169,23 @@
                         <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/circle_light_blue" android:padding="8dp" android:src="@android:drawable/ic_dialog_email" app:tint="@color/trust_blue" />
                         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:orientation="vertical">
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Email Address" android:textColor="@color/cool_grey" android:textSize="12sp" />
-                            <TextView android:id="@+id/tvPatientDOB" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textColor="@color/slate_navy" android:textSize="14sp" android:textStyle="bold" />
+                            <TextView android:id="@+id/tvAdminEmail" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textColor="@color/slate_navy" android:textSize="14sp" android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
                         <ImageView android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/circle_light_blue" android:padding="8dp" android:src="@android:drawable/ic_menu_mapmode" app:tint="@color/trust_blue" />
                         <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="16dp" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Address" android:textColor="@color/cool_grey" android:textSize="12sp" />
-                            <TextView android:id="@+id/tvPatientAddress" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textColor="@color/slate_navy" android:textSize="14sp" android:textStyle="bold" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Clinic Address" android:textColor="@color/cool_grey" android:textSize="12sp" />
+                            <TextView android:id="@+id/tvAdminAddress" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Loading..." android:textColor="@color/slate_navy" android:textSize="14sp" android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
-                android:id="@+id/tvAccountActionsLabel"
+                android:id="@+id/tvAdminActionsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -206,7 +205,7 @@
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@+id/tvAccountActionsLabel">
+                app:layout_constraintTop_toBottomOf="@+id/tvAdminActionsLabel">
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

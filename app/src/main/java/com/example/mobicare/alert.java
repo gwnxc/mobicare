@@ -256,12 +256,41 @@ public class alert extends Fragment {
     private void setupBottomNavigation(View view) {
         LinearLayout navHome = view.findViewById(R.id.nav_home);
         LinearLayout navInventory = view.findViewById(R.id.nav_inventory);
+        LinearLayout navAlerts = view.findViewById(R.id.nav_alerts);
         LinearLayout navProfile = view.findViewById(R.id.nav_profile);
 
-// SYNCED ACTIONS: Ensuring these match the IDs in nav_graph.xml
-        if (navHome != null) navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_inventoryFragment)); // Use global action or correct ID
-        if (navInventory != null) navInventory.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_inventoryFragment));
-        if (navProfile != null) navProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_profileFragment));
+        // --- Highlight Logic ---
+        int activeColor = Color.parseColor("#155A91"); // Blue
+        int inactiveColor = Color.parseColor("#8E8E8E"); // Grey
+
+        if (navHome != null) {
+            ((ImageView) navHome.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navHome.getChildAt(1)).setTextColor(inactiveColor);
+            // FIXED: Uses the Alert Fragment's specific action to go Home
+            navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminAlertsFragment_to_adminDashboardFragment));
+        }
+
+        if (navInventory != null) {
+            ((ImageView) navInventory.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navInventory.getChildAt(1)).setTextColor(inactiveColor);
+            // FIXED: Uses the Alert Fragment's specific action to go to Inventory
+            navInventory.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminAlertsFragment_to_inventoryFragment));
+        }
+
+        if (navAlerts != null) {
+            View alertsIcon = ((android.widget.FrameLayout) navAlerts.getChildAt(0)).getChildAt(0);
+            if (alertsIcon instanceof ImageView) ((ImageView) alertsIcon).setColorFilter(activeColor);
+            ((TextView) navAlerts.getChildAt(1)).setTextColor(activeColor);
+            // Already on Alerts
+            navAlerts.setOnClickListener(v -> {});
+        }
+
+        if (navProfile != null) {
+            ((ImageView) navProfile.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navProfile.getChildAt(1)).setTextColor(inactiveColor);
+            // FIXED: Uses the Alert Fragment's specific action to go to Profile
+            navProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminAlertsFragment_to_adminProfileFragment));
+        }
     }
 
     class NotificationItem {

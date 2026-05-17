@@ -1,16 +1,12 @@
 package com.example.mobicare;
 
 import android.graphics.Color;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,15 +20,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import androidx.navigation.Navigation;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,9 +55,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // We initialize Firebase early to check data
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        // Logic: You can determine which XML to inflate here.
-        // For now, I'll keep your management layout as requested.
         return inflater.inflate(R.layout.fragment_health_worker_dashboard, container, false);
     }
 
@@ -79,6 +67,7 @@ public class HealthWorkerDashboardFragment extends Fragment {
 
         // Point to the Users node in Firebase
         mDatabase = FirebaseDatabase.getInstance().getReference("Users");
+
         // 1. Initialize Views
         tvChildrenCount = view.findViewById(R.id.tvChildrenCountDashboard);
         tvMotherCount = view.findViewById(R.id.tvMotherCountDashboard);
@@ -92,8 +81,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
         slot2 = view.findViewById(R.id.activity2);
         slot3 = view.findViewById(R.id.activity3);
 
-        // Hide slots by default until data arrives
-        // Safe version: Only set visibility if the view was actually found
         if (slot1 != null) slot1.setVisibility(View.GONE);
         if (slot2 != null) slot2.setVisibility(View.GONE);
         if (slot3 != null) slot3.setVisibility(View.GONE);
@@ -103,39 +90,62 @@ public class HealthWorkerDashboardFragment extends Fragment {
         if (ivProfile != null) {
             ivProfile.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.profileFragment));
         }
+
         // --- QUICK ACTION CARD LISTENERS ---
-        view.findViewById(R.id.cvRegisterPatient).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.registrationHubFragment));
+        View cvRegister = view.findViewById(R.id.cvRegisterPatient);
+        if(cvRegister != null) cvRegister.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.registrationHubFragment));
 
-        view.findViewById(R.id.cvAddRecord).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.addConsultationFragment));
+        View cvAddRecord = view.findViewById(R.id.cvAddRecord);
+        if(cvAddRecord != null) cvAddRecord.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.addConsultationFragment));
 
-        view.findViewById(R.id.cvConsultations).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.consultationsFragment));
+        View cvConsult = view.findViewById(R.id.cvConsultations);
+        if(cvConsult != null) cvConsult.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.consultationsFragment));
 
-        view.findViewById(R.id.cvViewRecords).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.viewRecordsFragment));
+        View cvViewRec = view.findViewById(R.id.cvViewRecords);
+        if(cvViewRec != null) cvViewRec.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.viewRecordsFragment));
 
-        view.findViewById(R.id.cvNotifications).setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.alertsFragment));
+        View cvNotif = view.findViewById(R.id.cvNotifications);
+        if(cvNotif != null) cvNotif.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.alertsFragment));
 
-        btnLogout.setOnClickListener(v -> showLogoutConfirmation());
-
+        if(btnLogout != null) btnLogout.setOnClickListener(v -> showLogoutConfirmation());
 
         // Link to UI Elements
         llWorkerList = view.findViewById(R.id.llWorkerList);
         tvCount = view.findViewById(R.id.tvCount);
 
-        // 1. Back Button Navigation
         ImageView btnBack = view.findViewById(R.id.btnBack);
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> Navigation.findNavController(view).navigateUp());
         }
 
-        // 2. Add Worker Dialog Button
         MaterialButton btnAddWorker = view.findViewById(R.id.btnAddWorker);
         if (btnAddWorker != null) {
             btnAddWorker.setOnClickListener(v -> showAddWorkerDialog());
+        }
+
+        // ---> FIXED: CLEANED UP DUPLICATE BOTTOM NAVIGATION LOGIC <---
+        BottomNavigationView bottomNav = view.findViewById(R.id.bottomNavHealthWorker);
+        if (bottomNav != null) {
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+
+                if (id == R.id.healthWorkerDashboardFragment) {
+                    // They clicked Home. We are already on the Dashboard, so do nothing.
+                    return true;
+                }
+                else if (id == R.id.addConsultationFragment) {
+                    // They clicked Add. Navigate to the Add Consultation screen.
+                    Navigation.findNavController(view).navigate(R.id.action_dashboard_to_addConsultation);
+                    return true;
+                }
+                else if (id == R.id.profileFragment) {
+                    // They clicked Profile. Navigate to the Health Worker Profile screen.
+                    Navigation.findNavController(view).navigate(R.id.profileFragment);
+                    return true;
+                }
+
+                return false;
+            });
         }
 
         // 3. Initialize Data Loaders
@@ -144,7 +154,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
         fetchHealthWorkerProfile();
         listenForNotifications();
         listenForRecentActivities();
-
     }
 
     private void showAddWorkerDialog() {
@@ -157,35 +166,22 @@ public class HealthWorkerDashboardFragment extends Fragment {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // Buttons
         MaterialButton btnAdd = dialogView.findViewById(R.id.btnDialogAdd);
         MaterialButton btnCancel = dialogView.findViewById(R.id.btnDialogCancel);
         ImageView btnClose = dialogView.findViewById(R.id.btnDialogClose);
 
-        // Input Fields
         EditText etName = dialogView.findViewById(R.id.etDialogFullName);
         EditText etUser = dialogView.findViewById(R.id.etDialogUsername);
         EditText etPass = dialogView.findViewById(R.id.etDialogPassword);
         EditText etPhone = dialogView.findViewById(R.id.etDialogPhone);
         EditText etEmail = dialogView.findViewById(R.id.etDialogEmail);
 
-        // Setup the Spinner for Specialization (FIXED ERROR: No longer uses EditText)
         Spinner spinnerSpec = dialogView.findViewById(R.id.spinnerSpecialization);
-
         String[] specializations = {
-                "General Practice",
-                "Midwifery",
-                "Barangay Health Worker (BHW)",
-                "Pediatrics",
-                "Nutritionist",
-                "Obstetrics"
+                "General Practice", "Midwifery", "Barangay Health Worker (BHW)",
+                "Pediatrics", "Nutritionist", "Obstetrics"
         };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                specializations
-        );
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, specializations);
         spinnerSpec.setAdapter(adapter);
 
         btnAdd.setOnClickListener(v -> {
@@ -194,12 +190,9 @@ public class HealthWorkerDashboardFragment extends Fragment {
             String pass = etPass.getText().toString().trim();
             String phone = etPhone.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
-
-            // Get the selected item from the dropdown instead of an EditText
             String spec = spinnerSpec.getSelectedItem().toString();
 
             if (!name.isEmpty() && !user.isEmpty() && !pass.isEmpty()) {
-
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("fullName", name);
                 map.put("username", user);
@@ -208,11 +201,9 @@ public class HealthWorkerDashboardFragment extends Fragment {
                 map.put("email", email);
                 map.put("specialization", spec);
                 map.put("role", "Health Worker");
-                map.put("registrationDate", System.currentTimeMillis()); // Added for the Activity Feed
+                map.put("registrationDate", System.currentTimeMillis());
 
-                // Generate a unique, random ID
                 String uniqueId = mDatabase.push().getKey();
-
                 if (uniqueId != null) {
                     mDatabase.child(uniqueId).setValue(map).addOnCompleteListener(task -> {
                         if(task.isSuccessful()){
@@ -223,7 +214,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
                         }
                     });
                 }
-
             } else {
                 Toast.makeText(getContext(), "Name, Username, and Password are required", Toast.LENGTH_SHORT).show();
             }
@@ -231,7 +221,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         btnClose.setOnClickListener(v -> dialog.dismiss());
-
         dialog.show();
     }
 
@@ -239,15 +228,11 @@ public class HealthWorkerDashboardFragment extends Fragment {
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (llWorkerList != null) {
-                    llWorkerList.removeAllViews();
-                }
+                if (llWorkerList != null) llWorkerList.removeAllViews();
                 int count = 0;
 
                 for (DataSnapshot userSnap : snapshot.getChildren()) {
-                    // Check if the user is actually a Health Worker before showing them
                     String role = userSnap.child("role").getValue(String.class);
-
                     if (role != null && role.equals("Health Worker")) {
                         count++;
                         String name = userSnap.child("fullName").getValue(String.class);
@@ -260,12 +245,8 @@ public class HealthWorkerDashboardFragment extends Fragment {
                         addWorkerCardToUI(name, spec, uniqueId, phone, email, regDate);
                     }
                 }
-
-                if (tvCount != null) {
-                    tvCount.setText(count + " registered health workers");
-                }
+                if (tvCount != null) tvCount.setText(count + " registered health workers");
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(getContext(), "Failed to load workers.", Toast.LENGTH_SHORT).show();
@@ -273,7 +254,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
         });
     }
 
-    // FIXED ERROR: Handles the new XML layout with Phone, Email, and Date (No tvUser)
     private void addWorkerCardToUI(String name, String spec, String uniqueId, String phone, String email, Long regDate) {
         View card = getLayoutInflater().inflate(R.layout.item_worker_card, null);
 
@@ -288,7 +268,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
         tvPhone.setText(phone != null && !phone.isEmpty() ? "📞 " + phone : "📞 No phone provided");
         tvEmail.setText(email != null && !email.isEmpty() ? "✉️ " + email : "✉️ No email provided");
 
-        // Format the timestamp into a readable date
         if (regDate != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             String dateString = sdf.format(new Date(regDate));
@@ -297,54 +276,40 @@ public class HealthWorkerDashboardFragment extends Fragment {
             tvDate.setText("Added date unknown");
         }
 
-        // Setup the Edit Button
-        card.findViewById(R.id.btnEdit).setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Edit feature coming soon for " + name, Toast.LENGTH_SHORT).show();
-        });
-
-        // Setup the Delete Button
+        card.findViewById(R.id.btnEdit).setOnClickListener(v -> Toast.makeText(getContext(), "Edit feature coming soon for " + name, Toast.LENGTH_SHORT).show());
         card.findViewById(R.id.btnDelete).setOnClickListener(v -> {
             mDatabase.child(uniqueId).removeValue();
             Toast.makeText(getContext(), "Deleted " + name, Toast.LENGTH_SHORT).show();
         });
 
-        if (llWorkerList != null) {
-            llWorkerList.addView(card);
-        }
+        if (llWorkerList != null) llWorkerList.addView(card);
     }
 
     private void listenForRecentActivities() {
         com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
-        String uid = "";
+        String uid = (user != null) ? user.getUid() : (currentUid != null ? currentUid : "");
 
-        if (user != null) {
-            uid = user.getUid();
-        } else if (currentUid != null && !currentUid.isEmpty()) {
-            uid = currentUid;
-        }
+        if (uid.isEmpty()) return;
+
         mDatabase.child("Recent_Activities").child(uid)
-                .orderByChild("timestamp")
-                .limitToLast(3)
+                .orderByChild("timestamp").limitToLast(3)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (!isAdded()) return;
 
                         if (!snapshot.exists()) {
-                            slot1.setVisibility(View.GONE);
+                            if(slot1 != null) slot1.setVisibility(View.GONE);
                             return;
                         }
 
                         java.util.List<DataSnapshot> activities = new java.util.ArrayList<>();
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                            activities.add(ds);
-                        }
+                        for (DataSnapshot ds : snapshot.getChildren()) activities.add(ds);
                         java.util.Collections.reverse(activities);
 
-                        // Reset visibility
-                        slot1.setVisibility(View.GONE);
-                        slot2.setVisibility(View.GONE);
-                        slot3.setVisibility(View.GONE);
+                        if(slot1 != null) slot1.setVisibility(View.GONE);
+                        if(slot2 != null) slot2.setVisibility(View.GONE);
+                        if(slot3 != null) slot3.setVisibility(View.GONE);
 
                         for (int i = 0; i < activities.size(); i++) {
                             DataSnapshot ds = activities.get(i);
@@ -354,25 +319,22 @@ public class HealthWorkerDashboardFragment extends Fragment {
 
                             String timeStr = "Just now";
                             if (timestamp != null) {
-                                timeStr = DateUtils.getRelativeTimeSpanString(timestamp,
-                                        System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString();
+                                timeStr = DateUtils.getRelativeTimeSpanString(timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString();
                             }
 
-                            if (i == 0) {
+                            if (i == 0 && slot1 != null) {
                                 slot1.setVisibility(View.VISIBLE);
                                 updateActivitySlot(slot1, type, desc, timeStr);
-                            } else if (i == 1) {
+                            } else if (i == 1 && slot2 != null) {
                                 slot2.setVisibility(View.VISIBLE);
                                 updateActivitySlot(slot2, type, desc, timeStr);
-                            } else if (i == 2) {
+                            } else if (i == 2 && slot3 != null) {
                                 slot3.setVisibility(View.VISIBLE);
                                 updateActivitySlot(slot3, type, desc, timeStr);
                             }
                         }
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 
@@ -383,27 +345,29 @@ public class HealthWorkerDashboardFragment extends Fragment {
         TextView timeStamp = row.findViewById(R.id.tvActivityTime);
         ImageView icon = row.findViewById(R.id.ivActivityIcon);
 
-        title.setText(type);
-        subtitle.setText(details);
-        timeStamp.setText(time);
+        if(title != null) title.setText(type);
+        if(subtitle != null) subtitle.setText(details);
+        if(timeStamp != null) timeStamp.setText(time);
 
-        switch (type) {
-            case "Patient Registered":
-                icon.setImageResource(R.drawable.ic_profile);
-                icon.setBackgroundResource(R.drawable.circle_light_blue);
-                icon.setColorFilter(Color.parseColor("#155A91"));
-                break;
-            case "Immunization":
-            case "Postnatal Care":
-                icon.setImageResource(R.drawable.ic_add_record);
-                icon.setBackgroundResource(R.drawable.circle_light_green);
-                icon.setColorFilter(Color.parseColor("#4CAF50"));
-                break;
-            case "Consultation":
-                icon.setImageResource(R.drawable.ic_consultation);
-                icon.setBackgroundResource(R.drawable.circle_light_blue);
-                icon.setColorFilter(Color.parseColor("#155A91"));
-                break;
+        if (icon != null) {
+            switch (type) {
+                case "Patient Registered":
+                    icon.setImageResource(R.drawable.ic_profile);
+                    icon.setBackgroundResource(R.drawable.circle_light_blue);
+                    icon.setColorFilter(Color.parseColor("#155A91"));
+                    break;
+                case "Immunization":
+                case "Postnatal Care":
+                    icon.setImageResource(R.drawable.ic_add_record);
+                    icon.setBackgroundResource(R.drawable.circle_light_green);
+                    icon.setColorFilter(Color.parseColor("#4CAF50"));
+                    break;
+                case "Consultation":
+                    icon.setImageResource(R.drawable.ic_consultation);
+                    icon.setBackgroundResource(R.drawable.circle_light_blue);
+                    icon.setColorFilter(Color.parseColor("#155A91"));
+                    break;
+            }
         }
     }
 
@@ -413,9 +377,7 @@ public class HealthWorkerDashboardFragment extends Fragment {
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
+        if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
         dialogView.findViewById(R.id.btnCancelLogout).setOnClickListener(v -> dialog.dismiss());
         dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
@@ -426,6 +388,7 @@ public class HealthWorkerDashboardFragment extends Fragment {
         });
         dialog.show();
     }
+
     private void fetchHealthWorkerProfile() {
         android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
         String userKey = prefs.getString("loggedUserKey", "");
@@ -436,14 +399,13 @@ public class HealthWorkerDashboardFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists() && isAdded()) {
                         String name = snapshot.child("fullName").getValue(String.class);
-                        TextView tvUserName = getView().findViewById(R.id.tvUserName);
+                        TextView tvUserName = getView() != null ? getView().findViewById(R.id.tvUserName) : null;
                         if (tvUserName != null && name != null) {
-                            tvUserName.setText(name); // Reflects Maria Santos
+                            tvUserName.setText(name);
                         }
                     }
                 }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
+                @Override public void onCancelled(@NonNull DatabaseError error) {}
             });
         }
     }
@@ -452,64 +414,39 @@ public class HealthWorkerDashboardFragment extends Fragment {
         mDatabase.child("Patients_Guardians").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (isAdded() && tvMotherCount != null) {
-                    tvMotherCount.setText(String.valueOf(snapshot.getChildrenCount()));
-                }
+                if (isAdded() && tvMotherCount != null) tvMotherCount.setText(String.valueOf(snapshot.getChildrenCount()));
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
 
         mDatabase.child("Patients_Children").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (isAdded() && tvChildrenCount != null) {
-                    tvChildrenCount.setText(String.valueOf(snapshot.getChildrenCount()));
-                }
+                if (isAdded() && tvChildrenCount != null) tvChildrenCount.setText(String.valueOf(snapshot.getChildrenCount()));
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        mDatabase.child("Consultations")
-                .orderByChild("status")
-                .equalTo("scheduled")
+        mDatabase.child("Consultations").orderByChild("status").equalTo("scheduled")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (isAdded() && tvUpcomingCount != null) {
-                            tvUpcomingCount.setText(String.valueOf(snapshot.getChildrenCount()));
-                        }
+                        if (isAdded() && tvUpcomingCount != null) tvUpcomingCount.setText(String.valueOf(snapshot.getChildrenCount()));
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {}
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
                 });
     }
 
     private void listenForNotifications() {
-        // 1. Get the current user safely
-        // Correct way to get the user
         com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
-        String uid = "";
+        String uid = (user != null) ? user.getUid() : (currentUid != null ? currentUid : "");
 
-        if (user != null) {
-            uid = user.getUid();
-        } else if (currentUid != null && !currentUid.isEmpty()) {
-            // Fallback to the SharedPreferences UID if Firebase Auth isn't ready
-            uid = currentUid;
-        }
-
-        // 2. Only run the listener if we actually have a UID
         if (!uid.isEmpty()) {
-            mDatabase.child("Notifications")
-                    .orderByChild("receiverUid")
-                    .equalTo(uid)
+            mDatabase.child("Notifications").orderByChild("receiverUid").equalTo(uid)
                     .addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            // Safety check to ensure fragment is still active
                             if (!isAdded()) return;
-
                             int unreadCount = 0;
                             for (DataSnapshot ds : snapshot.getChildren()) {
                                 Boolean isRead = ds.child("isRead").getValue(Boolean.class);
@@ -517,9 +454,7 @@ public class HealthWorkerDashboardFragment extends Fragment {
                             }
                             updateDashboardBadge(unreadCount);
                         }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {}
+                        @Override public void onCancelled(@NonNull DatabaseError error) {}
                     });
         }
     }

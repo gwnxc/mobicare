@@ -11,6 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+
+// ADDED: Import for the Bottom Navigation View
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,7 +39,7 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 1. Dual-ID logic (Auth for Patients, SharedPreferences for Health Workers)
+        // 1. Dual-ID logic
         String userId = "";
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -52,12 +56,12 @@ public class ProfileFragment extends Fragment {
         // 3. Initialize and Setup Information Rows
         setupInfoRows(view);
 
-        // 4. Setup Firebase (Point to HealthWorkers using currentUid)
+        // 4. Setup Firebase
         if (!currentUid.isEmpty()) {
             mDatabase = FirebaseDatabase.getInstance().getReference("HealthWorkers").child(currentUid);
         }
 
-        // 5. Navigation Listeners
+        // 5. General Navigation Listeners
         view.findViewById(R.id.btnBackProfile).setOnClickListener(v -> requireActivity().onBackPressed());
 
         view.findViewById(R.id.cvAddRecordProfile).setOnClickListener(v ->
@@ -66,10 +70,33 @@ public class ProfileFragment extends Fragment {
         view.findViewById(R.id.cvViewConsultationsProfile).setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.consultationsFragment));
 
-        // Logout stack logic
+        // Logout logic
         View btnLogoutContainer = view.findViewById(R.id.containerLogout);
         if (btnLogoutContainer != null) {
             btnLogoutContainer.setOnClickListener(v -> showLogoutConfirmation());
+        }
+
+        // ---> ADDED: Bottom Navigation Listener <---
+        BottomNavigationView bottomNav = view.findViewById(R.id.bottomNavHealthWorker);
+        if (bottomNav != null) {
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+
+                if (id == R.id.healthWorkerDashboardFragment) {
+                    Navigation.findNavController(view).navigate(R.id.healthWorkerDashboardFragment);
+                    return true;
+                }
+                else if (id == R.id.addConsultationFragment) {
+                    Navigation.findNavController(view).navigate(R.id.addConsultationFragment);
+                    return true;
+                }
+                else if (id == R.id.profileFragment) {
+                    // Already on Profile, do nothing
+                    return true;
+                }
+
+                return false;
+            });
         }
 
         // 6. Load Data
@@ -98,20 +125,17 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadProfileData() {
-        // 1. Get the key from SharedPreferences (Maria's path)
         android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
         String userKey = prefs.getString("loggedUserKey", "");
 
         if (userKey.isEmpty()) return;
 
-        // 2. Point specifically to the HealthWorker's node
         DatabaseReference profileRef = FirebaseDatabase.getInstance().getReference("HealthWorkers").child(userKey);
 
         profileRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists() && isAdded()) {
-                    // Check if your Firebase keys match these exactly (e.g., "fullName" vs "name")
                     String name = snapshot.child("fullName").getValue(String.class);
                     String spec = snapshot.child("specialization").getValue(String.class);
                     String email = snapshot.child("email").getValue(String.class);
@@ -119,11 +143,9 @@ public class ProfileFragment extends Fragment {
                     String user = snapshot.child("username").getValue(String.class);
                     Long date = snapshot.child("registrationDate").getValue(Long.class);
 
-                    // Update Header
                     tvHeaderName.setText(name != null ? name : "N/A");
                     tvHeaderRole.setText(spec != null ? spec : "Health Worker");
 
-                    // Update Row Values - IMPORTANT: Check that rowUser, rowPhone, etc., are initialized
                     updateRowValue(rowUser, user);
                     updateRowValue(rowPhone, phone);
                     updateRowValue(rowEmail, email);
@@ -141,7 +163,6 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    // Helper method to safely update the 'tvInfoValue' inside your included layouts
     private void updateRowValue(View row, String value) {
         if (row != null && value != null) {
             TextView tvValue = row.findViewById(R.id.tvInfoValue);
@@ -166,14 +187,11 @@ public class ProfileFragment extends Fragment {
         dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
             dialog.dismiss();
 
-            // 1. Clear Firebase Auth (For Patients)
             FirebaseAuth.getInstance().signOut();
 
-            // 2. Clear Maria's session (For Health Workers)
             android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
             prefs.edit().clear().apply();
 
-            // 3. Navigate back to Login
             Navigation.findNavController(requireView()).navigate(R.id.loginFragment);
 
             Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();

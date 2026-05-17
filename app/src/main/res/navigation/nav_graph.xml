@@ -35,142 +35,65 @@
         tools:layout="@layout/fragment_admin_dashboard">
 
         <action android:id="@+id/action_adminDashboardFragment_to_inventoryFragment" app:destination="@id/inventoryFragment" />
-        <action android:id="@+id/action_adminDashboardFragment_to_alertsFragment" app:destination="@id/alertsFragment" />
-        <action android:id="@+id/action_adminDashboardFragment_to_profileFragment" app:destination="@id/profileFragment" />
+        <action android:id="@+id/action_adminDashboardFragment_to_adminAlertsFragment" app:destination="@id/adminAlertsFragment" />
+        <action android:id="@+id/action_adminDashboardFragment_to_adminProfileFragment" app:destination="@id/adminProfileFragment" />
+
         <action android:id="@+id/action_adminDashboardFragment_to_healthWorkerManagementFragment" app:destination="@id/healthWorkerManagementFragment" />
         <action android:id="@+id/action_adminDashboardFragment_to_registerPatientFragment" app:destination="@id/registerPatientFragment" />
         <action android:id="@+id/action_adminDashboardFragment_to_viewMothersFragment" app:destination="@id/viewMothersFragment" />
         <action android:id="@+id/action_adminDashboardFragment_to_consultationsFragment" app:destination="@id/consultationsFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/childProfileFragment"
-        android:name="com.example.mobicare.childProfileFragment"
-        android:label="Child Profile"
-        tools:layout="@layout/fragment_child_profile">
-        <action
-            android:id="@+id/action_childProfileFragment_to_healthRecordsFragment"
-            app:destination="@id/healthRecordsFragment" />
+    <fragment android:id="@+id/childProfileFragment" android:name="com.example.mobicare.childProfileFragment" android:label="Child Profile" tools:layout="@layout/fragment_child_profile">
+        <action android:id="@+id/action_childProfileFragment_to_healthRecordsFragment" app:destination="@id/healthRecordsFragment" />
     </fragment>
 
     <fragment android:id="@+id/registrationHubFragment" android:name="com.example.mobicare.RegistrationHubFragment" android:label="RegistrationHubFragment"/>
     <fragment android:id="@+id/viewRecordsFragment" android:name="com.example.mobicare.ViewRecordsFragment" android:label="ViewRecordsFragment"/>
-    <fragment
-        android:id="@+id/consultationDetailsFragment"
-        android:name="com.example.mobicare.ConsultationDetailsFragment"
-        android:label="Details">
+    <fragment android:id="@+id/consultationDetailsFragment" android:name="com.example.mobicare.ConsultationDetailsFragment" android:label="Details">
         <argument android:name="consultationId" app:argType="string" />
         <argument android:name="status" app:argType="string" />
     </fragment>
 
-    <fragment
-        android:id="@+id/myChildrenFragment"
-        android:name="com.example.mobicare.myChildrenFragment"
-        android:label="My Children"
-        tools:layout="@layout/fragment_my_children">
-
-        <action
-            android:id="@+id/action_myChildrenFragment_to_childProfileFragment"
-            app:destination="@id/childProfileFragment" />
-
+    <fragment android:id="@+id/myChildrenFragment" android:name="com.example.mobicare.myChildrenFragment" android:label="My Children" tools:layout="@layout/fragment_my_children">
+        <action android:id="@+id/action_myChildrenFragment_to_childProfileFragment" app:destination="@id/childProfileFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/inventoryFragment"
-        android:name="com.example.mobicare.inventory"
-        android:label="Inventory"
-        tools:layout="@layout/fragment_inventory">
+    <fragment android:id="@+id/inventoryFragment" android:name="com.example.mobicare.inventory" android:label="Inventory" tools:layout="@layout/fragment_inventory">
+        <action android:id="@+id/action_inventoryFragment_to_adminDashboardFragment" app:destination="@id/adminDashboardFragment" />
 
-        <action
-            android:id="@+id/action_inventoryFragment_to_adminDashboardFragment"
-            app:destination="@id/adminDashboardFragment" />
-
-        <action
-            android:id="@+id/action_inventoryFragment_to_alertsFragment"
-            app:destination="@id/alertsFragment" />
-
-        <action
-            android:id="@+id/action_inventoryFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
+        <action android:id="@+id/action_inventoryFragment_to_adminAlertsFragment" app:destination="@id/adminAlertsFragment" />
+        <action android:id="@+id/action_inventoryFragment_to_adminProfileFragment" app:destination="@id/adminProfileFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/healthWorkerDashboardFragment"
-        android:name="com.example.mobicare.HealthWorkerDashboardFragment"
-        android:label="Health Worker Dashboard">
-
-        <action
-            android:id="@+id/action_dashboard_to_registerMother"
-            app:destination="@id/registerMotherFragment" />
-        <action
-            android:id="@+id/action_dashboard_to_addConsultation"
-            app:destination="@id/addConsultationFragment" />
-        <action
-            android:id="@+id/action_dashboard_to_registrationHub"
-            app:destination="@id/registrationHubFragment" />
-        <action
-            android:id="@+id/action_dashboard_to_viewRecords"
-            app:destination="@id/viewRecordsFragment" />
-        <action
-            android:id="@+id/action_dashboard_to_consultations"
-            app:destination="@id/consultationsFragment" />
+    <fragment android:id="@+id/healthWorkerDashboardFragment" android:name="com.example.mobicare.HealthWorkerDashboardFragment" android:label="Health Worker Dashboard">
+        <action android:id="@+id/action_dashboard_to_registerMother" app:destination="@id/registerMotherFragment" />
+        <action android:id="@+id/action_dashboard_to_addConsultation" app:destination="@id/addConsultationFragment" />
+        <action android:id="@+id/action_dashboard_to_registrationHub" app:destination="@id/registrationHubFragment" />
+        <action android:id="@+id/action_dashboard_to_viewRecords" app:destination="@id/viewRecordsFragment" />
+        <action android:id="@+id/action_dashboard_to_consultations" app:destination="@id/consultationsFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/patientDashboardFragment"
-        android:name="com.example.mobicare.patientDashboardFragment"
-        android:label="Patient Dashboard"
-        tools:layout="@layout/fragment_patient_dashboard">
-
-        <action
-            android:id="@+id/action_patientDashboardFragment_to_myChildrenFragment"
-            app:destination="@id/myChildrenFragment" />
-
-        <action
-            android:id="@+id/action_patientDashboardFragment_to_patientProfileFragment"
-            app:destination="@id/patientProfileFragment" />
-
-        <action
-            android:id="@+id/action_patientDashboardFragment_to_myRecordFragment"
-            app:destination="@id/myRecordFragment" />
-
-        <action
-            android:id="@+id/action_patientDashboardFragment_to_patientAlertsFragment"
-            app:destination="@id/patientAlertsFragment" />
-
-        <action
-            android:id="@+id/action_patientDashboardFragment_to_patientConsultationsFragment"
-            app:destination="@id/patientConsultationsFragment" />
-
+    <fragment android:id="@+id/patientDashboardFragment" android:name="com.example.mobicare.patientDashboardFragment" android:label="Patient Dashboard" tools:layout="@layout/fragment_patient_dashboard">
+        <action android:id="@+id/action_patientDashboardFragment_to_myChildrenFragment" app:destination="@id/myChildrenFragment" />
+        <action android:id="@+id/action_patientDashboardFragment_to_patientProfileFragment" app:destination="@id/patientProfileFragment" />
+        <action android:id="@+id/action_patientDashboardFragment_to_myRecordFragment" app:destination="@id/myRecordFragment" />
+        <action android:id="@+id/action_patientDashboardFragment_to_patientAlertsFragment" app:destination="@id/patientAlertsFragment" />
+        <action android:id="@+id/action_patientDashboardFragment_to_patientConsultationsFragment" app:destination="@id/patientConsultationsFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.mobicare.ProfileFragment"
-        android:label="Profile"
-        tools:layout="@layout/fragment_profile">
-
-        <action
-            android:id="@+id/action_profileFragment_to_adminDashboardFragment"
-            app:destination="@id/adminDashboardFragment" />
-
-        <action
-            android:id="@+id/action_profileFragment_to_inventoryFragment"
-            app:destination="@id/inventoryFragment" />
-
-        <action
-            android:id="@+id/action_profileFragment_to_alertsFragment"
-            app:destination="@id/alertsFragment" />
-
+    <fragment android:id="@+id/profileFragment" android:name="com.example.mobicare.ProfileFragment" android:label="Profile" tools:layout="@layout/fragment_profile">
+        <action android:id="@+id/action_profileFragment_to_adminDashboardFragment" app:destination="@id/adminDashboardFragment" />
+        <action android:id="@+id/action_profileFragment_to_inventoryFragment" app:destination="@id/inventoryFragment" />
+        <action android:id="@+id/action_profileFragment_to_alertsFragment" app:destination="@id/alertsFragment" />
     </fragment>
 
     <fragment android:id="@+id/myRecordFragment" android:name="com.example.mobicare.healthRecordsFragment" android:label="My Records" />
-
     <fragment android:id="@+id/patientAlertsFragment" android:name="com.example.mobicare.patientAlertsFragment" android:label="My Alerts" />
-
     <fragment android:id="@+id/patientConsultationsFragment" android:name="com.example.mobicare.patientConsultationsFragment" android:label="My Consultations" />
 
     <fragment android:id="@+id/alertsFragment" android:name="com.example.mobicare.AlertsFragment" />
+
     <fragment android:id="@+id/healthWorkerManagementFragment" android:name="com.example.mobicare.health_worker_management" />
     <fragment android:id="@+id/registerPatientFragment" android:name="com.example.mobicare.registerPatient" />
     <fragment android:id="@+id/viewMothersFragment" android:name="com.example.mobicare.view_mothers" />
@@ -180,4 +103,25 @@
     <fragment android:id="@+id/addConsultationFragment" android:name="com.example.mobicare.AddConsultationFragment" />
     <fragment android:id="@+id/patientProfileFragment" android:name="com.example.mobicare.patientProfileFragment" />
     <fragment android:id="@+id/healthRecordsFragment" android:name="com.example.mobicare.healthRecordsFragment" />
+
+    <fragment
+        android:id="@+id/adminProfileFragment"
+        android:name="com.example.mobicare.profile"
+        android:label="Admin Profile"
+        tools:layout="@layout/fragment_profile_admin">
+        <action android:id="@+id/action_adminProfileFragment_to_adminDashboardFragment" app:destination="@id/adminDashboardFragment" />
+        <action android:id="@+id/action_adminProfileFragment_to_inventoryFragment" app:destination="@id/inventoryFragment" />
+        <action android:id="@+id/action_adminProfileFragment_to_adminAlertsFragment" app:destination="@id/adminAlertsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminAlertsFragment"
+        android:name="com.example.mobicare.alert"
+        android:label="Admin Alerts"
+        tools:layout="@layout/alert">
+        <action android:id="@+id/action_adminAlertsFragment_to_adminDashboardFragment" app:destination="@id/adminDashboardFragment" />
+        <action android:id="@+id/action_adminAlertsFragment_to_inventoryFragment" app:destination="@id/inventoryFragment" />
+        <action android:id="@+id/action_adminAlertsFragment_to_adminProfileFragment" app:destination="@id/adminProfileFragment" />
+    </fragment>
+
 </navigation>

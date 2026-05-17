@@ -20,6 +20,8 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
+// Import for MaterialCardView
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -49,7 +51,7 @@ public class profile extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        return inflater.inflate(R.layout.fragment_profile_admin, container, false);
     }
 
     @Override
@@ -67,7 +69,7 @@ public class profile extends Fragment {
             return;
         }
 
-        // ---> CHANGED: Now points exactly to the "Admin" node instead of "Users" <---
+        // Now points exactly to the "Admin" node instead of "Users"
         adminRef = FirebaseDatabase.getInstance().getReference("Admin").child(loggedInAdminId);
 
         // UI Setup
@@ -79,9 +81,10 @@ public class profile extends Fragment {
         tvAdminPhone = view.findViewById(R.id.tvAdminPhone);
         tvAdminAddress = view.findViewById(R.id.tvAdminAddress);
 
-        MaterialButton btnEditProfile = view.findViewById(R.id.btnEditProfile);
-        MaterialButton btnChangePassword = view.findViewById(R.id.btnChangePassword);
-        MaterialButton btnLogout = view.findViewById(R.id.btnLogout);
+        // ---> THE FIX: btnLogout is now correctly identified as an ImageView! <---
+        MaterialCardView btnEditProfile = view.findViewById(R.id.btnEditProfile);
+        MaterialCardView btnChangePassword = view.findViewById(R.id.btnChangePassword);
+        ImageView btnLogout = view.findViewById(R.id.btnLogout);
 
         setupBottomNavigation(view);
 
@@ -89,17 +92,20 @@ public class profile extends Fragment {
         loadAdminProfile();
 
         // Button Clicks
-        btnEditProfile.setOnClickListener(v -> showEditProfileDialog());
-        btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
+        if (btnEditProfile != null) btnEditProfile.setOnClickListener(v -> showEditProfileDialog());
+        if (btnChangePassword != null) btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
 
-        btnLogout.setOnClickListener(v -> {
-            // Clear the sticky note so they don't stay logged in!
-            prefs.edit().clear().apply();
+        // Logout Logic
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> {
+                // Clear the sticky note so they don't stay logged in!
+                prefs.edit().clear().apply();
 
-            Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
-            NavOptions navOptions = new NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build();
-            Navigation.findNavController(view).navigate(R.id.loginFragment, null, navOptions);
-        });
+                Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
+                NavOptions navOptions = new NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build();
+                Navigation.findNavController(view).navigate(R.id.loginFragment, null, navOptions);
+            });
+        }
     }
 
     private void loadAdminProfile() {
@@ -112,7 +118,7 @@ public class profile extends Fragment {
                     currentEmail = snapshot.child("email").getValue(String.class);
                     currentAddress = snapshot.child("address").getValue(String.class);
 
-                    // ---> THE FIX: Safely grab the phone number whether it is a Long or a String! <---
+                    // Safely grab the phone number whether it is a Long or a String
                     Object phoneObj = snapshot.child("phone").getValue();
                     if (phoneObj != null) {
                         currentPhone = String.valueOf(phoneObj);
@@ -161,11 +167,10 @@ public class profile extends Fragment {
 
             if (!newName.isEmpty()) {
                 HashMap<String, Object> updates = new HashMap<>();
-                updates.put("fullName", newName); // Using "fullName" to match your DB
+                updates.put("fullName", newName);
                 updates.put("phone", newPhone.isEmpty() ? "Not set" : newPhone);
                 updates.put("address", newAddress.isEmpty() ? "Not set" : newAddress);
 
-                // Because adminRef points to "Admin", this saves perfectly in the right spot!
                 adminRef.updateChildren(updates).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(getContext(), "Profile updated!", Toast.LENGTH_SHORT).show();
@@ -227,9 +232,34 @@ public class profile extends Fragment {
         LinearLayout navHome = view.findViewById(R.id.nav_home);
         LinearLayout navInventory = view.findViewById(R.id.nav_inventory);
         LinearLayout navAlerts = view.findViewById(R.id.nav_alerts);
+        LinearLayout navProfile = view.findViewById(R.id.nav_profile);
 
-        if (navHome != null) navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_adminDashboardFragment));
-        if (navInventory != null) navInventory.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_inventoryFragment));
-        if (navAlerts != null) navAlerts.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_profileFragment_to_alertsFragment));
+        int activeColor = Color.parseColor("#155A91"); // Blue
+        int inactiveColor = Color.parseColor("#8E8E8E"); // Grey
+
+        if (navHome != null) {
+            ((ImageView) navHome.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navHome.getChildAt(1)).setTextColor(inactiveColor);
+            navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminProfileFragment_to_adminDashboardFragment));
+        }
+
+        if (navInventory != null) {
+            ((ImageView) navInventory.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navInventory.getChildAt(1)).setTextColor(inactiveColor);
+            navInventory.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminProfileFragment_to_inventoryFragment));
+        }
+
+        if (navAlerts != null) {
+            View alertsIcon = ((android.widget.FrameLayout) navAlerts.getChildAt(0)).getChildAt(0);
+            if (alertsIcon instanceof ImageView) ((ImageView) alertsIcon).setColorFilter(inactiveColor);
+            ((TextView) navAlerts.getChildAt(1)).setTextColor(inactiveColor);
+            navAlerts.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.action_adminProfileFragment_to_adminAlertsFragment));
+        }
+
+        if (navProfile != null) {
+            ((ImageView) navProfile.getChildAt(0)).setColorFilter(activeColor);
+            ((TextView) navProfile.getChildAt(1)).setTextColor(activeColor);
+            navProfile.setOnClickListener(v -> {}); // Already on Profile
+        }
     }
 }
