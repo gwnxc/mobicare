@@ -124,7 +124,7 @@
         <action android:id="@+id/action_profileFragment_to_alertsFragment" app:destination="@id/alertsFragment" />
     </fragment>
 
-    <fragment android:id="@+id/myRecordFragment" android:name="com.example.mobicare.healthRecordsFragment" android:label="My Records" />
+
 
     <fragment android:id="@+id/patientAlertsFragment" android:name="com.example.mobicare.patientAlertsFragment" android:label="My Alerts" />
 
