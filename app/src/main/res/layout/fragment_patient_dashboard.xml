@@ -21,7 +21,7 @@
             <View
                 android:id="@+id/headerBackground"
                 android:layout_width="match_parent"
-                android:layout_height="320dp"
+                android:layout_height="300dp"
                 android:background="@drawable/header_rounded_bottom"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -72,7 +72,7 @@
                         android:gravity="center_vertical"
                         android:orientation="vertical"
                         android:padding="14dp">
-                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_menu_myplaces" app:tint="@color/pure_white" />
+                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_child" app:tint="@color/pure_white" />
                         <TextView android:id="@+id/tvChildrenCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="0" android:textColor="@color/pure_white" android:textSize="20sp" android:textStyle="bold" />
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Children" android:textColor="#CCFFFFFF" android:textSize="12sp" />
                     </LinearLayout>
@@ -87,7 +87,7 @@
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="vertical" android:padding="14dp">
-                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_menu_today" app:tint="@color/pure_white" />
+                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_consultation" app:tint="@color/pure_white" />
                         <TextView android:id="@+id/tvUpcomingCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="0" android:textColor="@color/pure_white" android:textSize="20sp" android:textStyle="bold" />
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Upcoming" android:textColor="#CCFFFFFF" android:textSize="12sp" />
                     </LinearLayout>
@@ -102,7 +102,7 @@
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="vertical" android:padding="14dp">
-                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@android:drawable/ic_popup_reminder" app:tint="@color/pure_white" />
+                        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_notifications" app:tint="@color/pure_white" />
                         <TextView android:id="@+id/tvAlertBadgeCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="0" android:textColor="@color/pure_white" android:textSize="20sp" android:textStyle="bold" />
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Alerts" android:textColor="#CCFFFFFF" android:textSize="12sp" />
                     </LinearLayout>
@@ -141,9 +141,9 @@
                     app:cardCornerRadius="24dp"
                     app:cardElevation="2dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical" android:padding="24dp">
-                        <ImageView android:layout_width="44dp" android:layout_height="44dp" android:background="@drawable/badge_green_light" android:padding="10dp" android:src="@android:drawable/ic_menu_myplaces" app:tint="#4CAF50" />
+                        <ImageView android:layout_width="44dp" android:layout_height="44dp" android:background="@drawable/badge_green_light" android:padding="10dp" android:src="@drawable/ic_child" app:tint="#4CAF50" />
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="My Children" android:textColor="@color/slate_navy" android:textStyle="bold" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View records" android:textColor="@color/cool_grey" android:textSize="12sp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View records" android:textColor="@color/slate_navy" android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -157,9 +157,9 @@
                     app:cardCornerRadius="24dp"
                     app:cardElevation="2dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical" android:padding="24dp">
-                        <ImageView android:layout_width="44dp" android:layout_height="44dp" android:background="@drawable/circle_light_blue" android:padding="10dp" android:src="@android:drawable/ic_menu_today" app:tint="@color/trust_blue" />
+                        <ImageView android:layout_width="44dp" android:layout_height="44dp" android:background="@drawable/circle_light_blue" android:padding="10dp" android:src="@drawable/ic_consultation" app:tint="@color/trust_blue" />
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Consultations" android:textColor="@color/slate_navy" android:textStyle="bold" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Schedule &amp; view" android:textColor="@color/cool_grey" android:textSize="12sp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Schedule &amp; view" android:textColor="@color/slate_navy" android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -195,7 +195,7 @@
                         android:background="@drawable/circle_green"
                         android:backgroundTint="#E0F2F1"
                         android:padding="12dp"
-                        android:src="@android:drawable/ic_menu_my_calendar"
+                        android:src="@drawable/ic_records"
                         app:tint="#00796B" />
 
                     <LinearLayout
@@ -218,7 +218,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="View your prenatal data"
-                            android:textColor="#64748B"
+                            android:textColor="@color/slate_navy"
                             android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -230,7 +230,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="12dp"
-                tools:layout_editor_absoluteY="729dp"></LinearLayout>
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="24dp"
+                app:layout_constraintTop_toBottomOf="@+id/cvMyRecord"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

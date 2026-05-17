@@ -1,5 +1,6 @@
 package com.example.mobicare;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,14 +8,15 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordViewHolder> implements Filterable {
 
-    private List<Object> listFull; // For searching
-    private List<Object> listDisplay; // What is currently on screen
+    private List<Object> listFull;
+    private List<Object> listDisplay;
 
     public RecordAdapter(List<Object> list) {
         this.listDisplay = list;
@@ -30,16 +32,41 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
 
     @Override
     public void onBindViewHolder(@NonNull RecordViewHolder holder, int position) {
-        Object item = listDisplay.get(position);
+        // FIX 1: Use listDisplay instead of the non-existent dataList variable
+        Object patientItem = listDisplay.get(position);
 
-        if (item instanceof Mother) {
-            Mother m = (Mother) item;
-            // Use the GETTER method here
+        holder.itemView.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+
+            if (patientItem instanceof Mother) {
+                Mother mother = (Mother) patientItem;
+                String momName = mother.getFullName();
+
+                args.putString("selectedChildId", mother.getLinkedUid());
+                args.putString("selectedChildName", momName);
+
+                // FIXED ID: Changed to match your exact nav_graph action ID
+                Navigation.findNavController(v).navigate(R.id.action_viewRecords_to_myRecord, args);
+
+            } else if (patientItem instanceof Child) {
+                Child child = (Child) patientItem;
+                String childName = child.firstName + " " + child.lastName;
+
+                args.putString("selectedChildId", child.getChildId());
+                args.putString("selectedChildName", childName);
+
+                // FIXED ID: Changed to match your exact nav_graph action ID
+                Navigation.findNavController(v).navigate(R.id.action_viewRecords_to_healthRecords, args);
+            }
+        });
+
+        // --- FIXED BINDING LOGIC (Using patientItem consistently) ---
+        if (patientItem instanceof Mother) {
+            Mother m = (Mother) patientItem;
             holder.tvName.setText(m.getFullName());
             holder.tvType.setText("Guardian");
-        } else if (item instanceof Child) {
-            Child c = (Child) item;
-            // USE THIS NAME since you kept it as placeOfBirth
+        } else if (patientItem instanceof Child) {
+            Child c = (Child) patientItem;
             holder.tvName.setText(c.firstName + " " + c.lastName);
             holder.tvType.setText("Child");
         }
@@ -55,6 +82,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
         this.listFull = new ArrayList<>(newList);
         notifyDataSetChanged();
     }
+
     @Override
     public Filter getFilter() {
         return recordFilter;
@@ -69,19 +97,15 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
             } else {
                 String pattern = constraint.toString().toLowerCase().trim();
                 for (Object item : listFull) {
-                    // Check for Mother/Guardian
                     if (item instanceof Mother) {
                         Mother m = (Mother) item;
-                        // This matches the name OR the "Guardian" chip
                         if (m.getFullName().toLowerCase().contains(pattern) || "guardian".contains(pattern)) {
                             filteredList.add(item);
                         }
                     }
-                    // Check for Child
                     else if (item instanceof Child) {
                         Child c = (Child) item;
                         String fullName = (c.firstName + " " + c.lastName).toLowerCase();
-                        // This matches the name OR the "Child" chip
                         if (fullName.contains(pattern) || "child".contains(pattern)) {
                             filteredList.add(item);
                         }

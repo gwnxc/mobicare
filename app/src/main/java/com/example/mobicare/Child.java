@@ -8,6 +8,7 @@ public class Child {
     public String gender;
     public String placeOfBirth;
     public String parentUid; // Store the UID here instead of just a name
+    private String childId; // Unique Firebase key for this child
 
     public Child() {}
 
@@ -20,5 +21,11 @@ public class Child {
         this.gender = gender;
         this.placeOfBirth = placeOfBirth;
         this.parentUid = parentUid;
+    }
+    public String getChildId() {
+        return childId;
+    }
+    public void setChildId(String childId) {
+        this.childId = childId;
     }
 }

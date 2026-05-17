@@ -6,95 +6,173 @@
     android:layout_marginBottom="16dp"
     app:cardBackgroundColor="@android:color/white"
     app:cardCornerRadius="16dp"
-    app:cardElevation="0dp"
-    app:strokeColor="#E2E8F0"
-    app:strokeWidth="1dp">
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <View
+            android:id="@+id/iconBg"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/circle_green"
+            android:backgroundTint="#E8F5E9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_pren"
+            app:layout_constraintBottom_toBottomOf="@id/iconBg"
+            app:layout_constraintEnd_toEndOf="@id/iconBg"
+            app:layout_constraintStart_toStartOf="@id/iconBg"
+            app:layout_constraintTop_toTopOf="@id/iconBg"
+            app:tint="#388E3C" />
+
+        <TextView
+            android:id="@+id/lblCheckupTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginStart="12dp"
+            android:text="Prenatal Checkup"
+            android:textColor="#1E293B"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/iconBg"
+            app:layout_constraintStart_toEndOf="@id/iconBg"
+            app:layout_constraintTop_toTopOf="@id/iconBg" />
 
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@drawable/circle_white"
-                android:backgroundTint="#E0F2F1"
-                android:padding="8dp"
-                android:src="@android:drawable/ic_menu_myplaces"
-                app:tint="#00796B" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:text="Prenatal Checkup"
-                android:textColor="#1E293B"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvPreDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/badge_green_light"
-                android:backgroundTint="#E0F2F1"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
-                android:text="2023-01-15"
-                android:textColor="#00796B"
-                android:textSize="12sp" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tvPrenatalDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_stat_box"
+            android:backgroundTint="#E0F2F1"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="2026-05-17"
+            android:textColor="#00796B"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
+            android:id="@+id/row1Vitals"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/bg_stat_box" android:orientation="vertical" android:padding="10dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Blood Pressure" android:textColor="#94A3B8" android:textSize="11sp" />
-                <TextView android:id="@+id/tvPreBP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="115/75" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/iconBg">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="#F8F9FA"
+                android:orientation="vertical"
+                android:padding="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Blood Pressure" android:textColor="#64748B" android:textSize="11sp"/>
+                <TextView android:id="@+id/tvBloodPressure" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="120" android:textColor="#1E293B" android:textSize="15sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
             </LinearLayout>
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/bg_stat_box" android:orientation="vertical" android:padding="10dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weight" android:textColor="#94A3B8" android:textSize="11sp" />
-                <TextView android:id="@+id/tvPreWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="58 kg" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:background="#F8F9FA"
+                android:orientation="vertical"
+                android:padding="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weight" android:textColor="#64748B" android:textSize="11sp"/>
+                <TextView android:id="@+id/tvWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="60 kg" android:textColor="#1E293B" android:textSize="15sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/row2Vitals"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="6dp" android:layout_weight="1" android:background="@drawable/bg_stat_box" android:orientation="vertical" android:padding="10dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fundal Height (FH)" android:textColor="#94A3B8" android:textSize="11sp" />
-                <TextView android:id="@+id/tvPreFH" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="12 cm" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/row1Vitals">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="#F8F9FA"
+                android:orientation="vertical"
+                android:padding="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fundal Height (FH)" android:textColor="#64748B" android:textSize="11sp"/>
+                <TextView android:id="@+id/tvFundalHeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="24 cm" android:textColor="#1E293B" android:textSize="15sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
             </LinearLayout>
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:layout_weight="1" android:background="@drawable/bg_stat_box" android:orientation="vertical" android:padding="10dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fetal Heart Tone (FHT)" android:textColor="#94A3B8" android:textSize="11sp" />
-                <TextView android:id="@+id/tvPreFHT" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="145 bpm" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:background="#F8F9FA"
+                android:orientation="vertical"
+                android:padding="10dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fetal Heart Tone (FHT)" android:textColor="#64748B" android:textSize="11sp"/>
+                <TextView android:id="@+id/tvFetalHeartTone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="sndmn" android:textColor="#1E293B" android:textSize="15sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
             </LinearLayout>
         </LinearLayout>
 
-        <TextView android:id="@+id/tvPreTT" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="TT Given: TT1" android:textColor="#475569" android:textSize="13sp" />
-        <TextView android:id="@+id/tvPreDiagnosis" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Diagnosis/Treatment: Patient is doing well." android:textColor="#475569" android:textSize="13sp" />
+        <TextView
+            android:id="@+id/tvTetanusToxoid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="TT Given: TT1"
+            android:textColor="#334155"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/row2Vitals" />
+
+        <TextView
+            android:id="@+id/tvDiagnosisTreatment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Diagnosis/Treatment: none"
+            android:textColor="#475569"
+            android:textSize="13sp"
+            app:layout_constraintTop_toBottomOf="@id/tvTetanusToxoid" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_today" app:tint="#00897B" />
-            <TextView android:id="@+id/tvPreReturn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="Return check-up: 2023-02-15" android:textColor="#00897B" android:textSize="13sp" />
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvDiagnosisTreatment">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_calendar"
+                app:tint="#0284C7" />
+
+            <TextView
+                android:id="@+id/tvReturnCheckup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Return check-up: 31/05/2026"
+                android:textColor="#0284C7"
+                android:textSize="13sp"
+                android:textStyle="bold" />
         </LinearLayout>
-    </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

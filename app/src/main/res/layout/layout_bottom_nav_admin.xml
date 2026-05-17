@@ -23,7 +23,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_directions"
+            android:src="@drawable/ic_home"
             app:tint="@color/trust_blue" />
         <TextView
             android:layout_width="wrap_content"
@@ -74,7 +74,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@android:drawable/ic_popup_reminder"
+                android:src="@drawable/ic_notifications"
                 app:tint="@color/cool_grey" />
 
             <TextView
@@ -111,7 +111,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_view"
+            android:src="@drawable/ic_profile"
             app:tint="@color/cool_grey" />
         <TextView
             android:layout_width="wrap_content"
