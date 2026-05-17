@@ -105,7 +105,15 @@ public class patientDashboardFragment extends Fragment {
         com.google.android.material.card.MaterialCardView cvMyRecord = view.findViewById(R.id.cvMyRecord);
         if (cvMyRecord != null) {
             cvMyRecord.setOnClickListener(v -> {
-                Navigation.findNavController(view).navigate(R.id.action_patientDashboardFragment_to_myRecordFragment);
+                // ADDED: Create a bundle parameter to safely forward identity metrics
+                Bundle args = new Bundle();
+                args.putString("selectedChildId", loggedInUserId);
+                args.putString("selectedChildName", motherFullName);
+
+                Navigation.findNavController(view).navigate(
+                        R.id.action_patientDashboardFragment_to_myRecordFragment,
+                        args
+                );
             });
         }
 

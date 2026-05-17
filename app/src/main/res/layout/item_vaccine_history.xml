@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="14dp"
     app:cardBackgroundColor="@android:color/white"
     app:cardCornerRadius="12dp"
     app:cardElevation="1dp"
@@ -23,7 +23,7 @@
             android:background="@drawable/circle_green"
             android:backgroundTint="#E8F5E9"
             android:padding="6dp"
-            android:src="@android:drawable/checkbox_on_background"
+            android:src="@drawable/ic_vaccination"
             app:tint="#388E3C" />
 
         <LinearLayout
@@ -48,7 +48,7 @@
                 android:layout_marginTop="4dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
-                <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@android:drawable/ic_menu_today" app:tint="#64748B" />
+                <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_calendar" app:tint="#64748B" />
                 <TextView android:id="@+id/tvHistGivenDate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="Given: 2023-05-20" android:textColor="#64748B" android:textSize="12sp" />
             </LinearLayout>
 
@@ -59,7 +59,7 @@
                 android:layout_marginTop="4dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
-                <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@android:drawable/ic_menu_recent_history" app:tint="#1976D2" />
+                <ImageView android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/ic_time" app:tint="#1976D2" />
                 <TextView android:id="@+id/tvHistNextDate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="Next dose: 2023-07-20" android:textColor="#1976D2" android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>

@@ -137,9 +137,21 @@ public class LoginFragment extends Fragment {
     }
 
     private void saveUserKeyAndNavigate(String role, String userKey, View view) {
-        // Save the ID so other fragments (like Records or Profile) know who is logged in
+        // FIX 1: Change "MobiCarePrefs" to "MobicarePrefs" (lowercase 'c') to match patientDashboardFragment
         SharedPreferences prefs = requireActivity().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE);
-        prefs.edit().putString("loggedInUser", userKey).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+
+        // FIX 2: Store BOTH key names so both your Dashboard and your History layout sections can read the ID
+        editor.putString("loggedUserKey", userKey);  // Used by healthRecordsFragment & MyRecordFragment
+        editor.putString("loggedInUser", userKey);   // Used by patientDashboardFragment
+
+        // Map UI roles neatly into authorization strings
+        if ("Mother".equals(role)) {
+            editor.putString("userRole", "Patient"); // Record fragments check for "Patient"
+        } else {
+            editor.putString("userRole", role); // Saves exactly "Health Worker" or "Admin"
+        }
+        editor.apply();
 
         // Single switch to handle all navigations
         switch (role) {

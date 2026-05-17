@@ -96,9 +96,12 @@ public class adminDashboardFragment extends Fragment {
         if (cvRegisterPatient != null) cvRegisterPatient.setOnClickListener(v ->
                 Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_registerPatientFragment)); // Matches line 79
 
+        // Inside onViewCreated in adminDashboardFragment.java
         MaterialCardView cvViewMothers = view.findViewById(R.id.cvViewMothers);
-        if (cvViewMothers != null) cvViewMothers.setOnClickListener(v ->
-                Navigation.findNavController(view).navigate(R.id.action_adminDashboardFragment_to_viewMothersFragment)); // Matches line 83
+        if (cvViewMothers != null) {
+            cvViewMothers.setOnClickListener(v ->
+                    Navigation.findNavController(view).navigate(R.id.action_adminDashboard_to_viewRecords));
+        } // FIXED BRACE HERE
 
         MaterialCardView cvConsultations = view.findViewById(R.id.cvConsultations);
         if (cvConsultations != null) cvConsultations.setOnClickListener(v ->
@@ -182,8 +185,8 @@ public class adminDashboardFragment extends Fragment {
     private void setupTopSummaryBadges(View view) {
         TextView tvChildrenCount = view.findViewById(R.id.tvChildrenCount);
         TextView tvUpcomingCount = view.findViewById(R.id.tvUpcomingCount);
-        TextView tvWorkersCount = view.findViewById(R.id.tvWorkersCount); // 3rd Dashboard Card
-        TextView tvBottomAlertBadge = view.findViewById(R.id.tvBottomAlertBadge); // Bottom Nav Badge
+        TextView tvWorkersCount = view.findViewById(R.id.tvWorkersCount);
+        TextView tvBottomAlertBadge = view.findViewById(R.id.tvBottomAlertBadge);
 
         // 1. Children Count
         if (tvChildrenCount != null) {
@@ -211,7 +214,7 @@ public class adminDashboardFragment extends Fragment {
             });
         }
 
-        // 3. Health Workers Count (Replaced Alerts on the Dashboard)
+        // 3. Health Workers Count
         if (tvWorkersCount != null) {
             FirebaseDatabase.getInstance().getReference("HealthWorkers").addValueEventListener(new ValueEventListener() {
                 @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -221,7 +224,7 @@ public class adminDashboardFragment extends Fragment {
             });
         }
 
-        // 4. Background Alert Scanner (Only updates Bottom Nav Badge & Push Notifications)
+        // 4. Background Alert Scanner
         FirebaseDatabase.getInstance().getReference("Inventory").addValueEventListener(new ValueEventListener() {
             @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                 int totalAlerts = 0;
@@ -252,7 +255,6 @@ public class adminDashboardFragment extends Fragment {
                     int savedAlertCount = prefs.getInt("savedAlertCount", 0);
                     boolean alertsViewed = prefs.getBoolean("alertsViewed", false);
 
-                    // If the number of alerts changes, reset the memory
                     if (totalAlerts != savedAlertCount) {
                         alertsViewed = false;
                         prefs.edit()
@@ -261,7 +263,6 @@ public class adminDashboardFragment extends Fragment {
                                 .apply();
                     }
 
-                    // Update Bottom Navigation Badge
                     if (tvBottomAlertBadge != null) {
                         if (totalAlerts > 0 && !alertsViewed) {
                             tvBottomAlertBadge.setVisibility(View.VISIBLE);
@@ -271,7 +272,6 @@ public class adminDashboardFragment extends Fragment {
                         }
                     }
 
-                    // Trigger Push Notification
                     if (totalAlerts > 0 && !alertsViewed) {
                         showPushNotification(totalAlerts);
                     }
@@ -314,7 +314,6 @@ public class adminDashboardFragment extends Fragment {
         if (llActivityLogList == null) return;
         llActivityLogList.removeAllViews();
 
-        // If nothing was found, show a message or hide the label
         if (masterActivityList.isEmpty()) {
             if (tvRecentActivityLabel != null) {
                 tvRecentActivityLabel.setText("Recent Activity (No recent activity)");
@@ -324,17 +323,14 @@ public class adminDashboardFragment extends Fragment {
             return;
         }
 
-        // Restore header text if we have data
         if (tvRecentActivityLabel != null) {
             tvRecentActivityLabel.setText("Recent Activity");
             tvRecentActivityLabel.setTextSize(20);
             tvRecentActivityLabel.setTextColor(getResources().getColor(R.color.slate_navy, null));
         }
 
-        // Sort descending (newest timestamp first)
         Collections.sort(masterActivityList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
 
-        // Limit to top 3
         int maxItemsToShow = Math.min(3, masterActivityList.size());
         List<ActivityEntry> recentThree = masterActivityList.subList(0, maxItemsToShow);
 

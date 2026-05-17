@@ -34,7 +34,10 @@ public class Mother {
     // Getters and Setters (Important for Firebase to read/write)
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
-
+    // Add this to your Mother.java so the Adapter can find the ID
+    public String getMotherId() {
+        return linkedUid;
+    }
     public String getBirthDate() { return birthDate; }
     public void setBirthDate(String birthDate) { this.birthDate = birthDate; }
 

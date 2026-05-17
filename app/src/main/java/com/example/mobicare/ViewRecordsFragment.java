@@ -46,42 +46,55 @@ public class ViewRecordsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // 1. Setup UI
-        rvRecords = view.findViewById(R.id.rvRecords);
-        searchView = view.findViewById(R.id.searchView);
-        chipGroup = view.findViewById(R.id.chipGroupFilter);
+        // 1. Get the current user's role from SharedPreferences
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
+        String userRole = prefs.getString("userRole", "");
 
-        // Initialize Stats Cards
-        cardTotal = view.findViewById(R.id.cardTotal);
-        cardGuardians = view.findViewById(R.id.cardGuardians);
-        cardChildren = view.findViewById(R.id.cardChildren);
+        // 2. Authorization Check: Only allow Health Workers and Admins
+        if ("Health Worker".equals(userRole) || "Admin".equals(userRole)) {
+            // authorized: Initialize the UI and load data
+            rvRecords = view.findViewById(R.id.rvRecords);
+            searchView = view.findViewById(R.id.searchView);
+            chipGroup = view.findViewById(R.id.chipGroupFilter);
 
-        setupStatsCardUI();
+            // Initialize Stats Cards
+            cardTotal = view.findViewById(R.id.cardTotal);
+            cardGuardians = view.findViewById(R.id.cardGuardians);
+            cardChildren = view.findViewById(R.id.cardChildren);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        loadDataFromFirebase();
+            setupStatsCardUI();
 
-        // 2. Search Listener
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) { return false; }
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (adapter != null) adapter.getFilter().filter(newText);
-                return true;
-            }
-        });
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            loadDataFromFirebase();
 
-        // 3. Filter Listener
-        chipGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (adapter == null) return;
-            if (checkedId == R.id.chipGuardians) adapter.getFilter().filter("Guardian");
-            else if (checkedId == R.id.chipChildren) adapter.getFilter().filter("Child");
-            else adapter.getFilter().filter("");
-        });
+            // Search Listener
+            searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) { return false; }
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if (adapter != null) adapter.getFilter().filter(newText);
+                    return true;
+                }
+            });
 
+            // Filter Listener
+            chipGroup.setOnCheckedChangeListener((group, checkedId) -> {
+                if (adapter == null) return;
+                if (checkedId == R.id.chipGuardians) adapter.getFilter().filter("Guardian");
+                else if (checkedId == R.id.chipChildren) adapter.getFilter().filter("Child");
+                else adapter.getFilter().filter("");
+            });
+        } else {
+            // Unauthorized (Patient): Show message and go back
+            android.widget.Toast.makeText(getContext(), "Access Denied: Management access only.", android.widget.Toast.LENGTH_SHORT).show();
+            androidx.navigation.Navigation.findNavController(view).navigateUp();
+            return;
+        }
+
+        // Common Back Button logic
         view.findViewById(R.id.btnBackRecords).setOnClickListener(v ->
-                Navigation.findNavController(v).navigateUp());
+                androidx.navigation.Navigation.findNavController(v).navigateUp());
     }
 
     private void setupStatsCardUI() {
@@ -112,12 +125,16 @@ public class ViewRecordsFragment extends Fragment {
                 if (!isAdded()) return;
 
                 int guardianCount = (int) snapshot.getChildrenCount();
-                tvGuardianCount.setText(String.valueOf(guardianCount));
+                if (tvGuardianCount != null) tvGuardianCount.setText(String.valueOf(guardianCount));
 
                 allRecords.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Mother mother = ds.getValue(Mother.class);
-                    if (mother != null) allRecords.add(mother);
+                    if (mother != null) {
+                        // Force the key inside the model
+                        mother.setLinkedUid(ds.getKey());
+                        allRecords.add(mother);
+                    }
                 }
                 fetchChildren(guardianCount);
             }
@@ -132,24 +149,26 @@ public class ViewRecordsFragment extends Fragment {
                 if (!isAdded()) return;
 
                 int childCount = (int) snapshot.getChildrenCount();
+                if (tvChildCount != null) tvChildCount.setText(String.valueOf(childCount));
+                if (tvTotalCount != null) tvTotalCount.setText(String.valueOf(guardianCount + childCount));
 
-                // UPDATE THE STATS CARDS HERE
-                tvChildCount.setText(String.valueOf(childCount));
-                tvTotalCount.setText(String.valueOf(guardianCount + childCount));
-
+                List<Object> continuousList = new ArrayList<>(allRecords);
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Child child = ds.getValue(Child.class);
-                    if (child != null) allRecords.add(child);
+                    if (child != null) {
+                        // CRITICAL FIX: Explicitly assign the push key to the child model
+                        child.setChildId(ds.getKey());
+                        continuousList.add(child);
+                    }
                 }
 
-                // REFRESH THE ADAPTER
-                if (adapter == null) {
-                    adapter = new RecordAdapter(allRecords);
+                if (rvRecords.getLayoutManager() == null) {
                     rvRecords.setLayoutManager(new LinearLayoutManager(getContext()));
-                    rvRecords.setAdapter(adapter);
-                } else {
-                    adapter.updateList(allRecords);
                 }
+
+                // Always instantiate a clean adapter to reload items cleanly when returning to this screen
+                adapter = new RecordAdapter(continuousList);
+                rvRecords.setAdapter(adapter);
             }
             @Override public void onCancelled(@NonNull DatabaseError error) {}
         });

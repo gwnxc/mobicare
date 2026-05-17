@@ -40,7 +40,12 @@
         <action android:id="@+id/action_adminDashboardFragment_to_healthWorkerManagementFragment" app:destination="@id/healthWorkerManagementFragment" />
         <action android:id="@+id/action_adminDashboardFragment_to_registerPatientFragment" app:destination="@id/registerPatientFragment" />
         <action android:id="@+id/action_adminDashboardFragment_to_viewMothersFragment" app:destination="@id/viewMothersFragment" />
-        <action android:id="@+id/action_adminDashboardFragment_to_consultationsFragment" app:destination="@id/consultationsFragment" />
+        <action
+            android:id="@+id/action_adminDashboard_to_viewRecords"
+            app:destination="@id/viewRecordsFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_consultationsFragment"
+            app:destination="@id/consultationsFragment" />
     </fragment>
 
     <fragment
@@ -54,7 +59,26 @@
     </fragment>
 
     <fragment android:id="@+id/registrationHubFragment" android:name="com.example.mobicare.RegistrationHubFragment" android:label="RegistrationHubFragment"/>
-    <fragment android:id="@+id/viewRecordsFragment" android:name="com.example.mobicare.ViewRecordsFragment" android:label="ViewRecordsFragment"/>
+    <fragment
+        android:id="@+id/viewRecordsFragment"
+        android:name="com.example.mobicare.ViewRecordsFragment"
+        android:label="View Patients"
+        tools:layout="@layout/fragment_view_records">
+
+        <action
+            android:id="@+id/action_viewRecords_to_healthRecords"
+            app:destination="@id/healthRecordsFragment" />
+
+        <action
+            android:id="@+id/action_viewRecords_to_myRecord"
+            app:destination="@id/myRecordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/myRecordFragment"
+        android:name="com.example.mobicare.MyRecordFragment"
+        android:label="Maternal Records"
+        tools:layout="@layout/fragment_my_record" />
+
     <fragment
         android:id="@+id/consultationDetailsFragment"
         android:name="com.example.mobicare.ConsultationDetailsFragment"
@@ -163,8 +187,6 @@
             app:destination="@id/alertsFragment" />
 
     </fragment>
-
-    <fragment android:id="@+id/myRecordFragment" android:name="com.example.mobicare.healthRecordsFragment" android:label="My Records" />
 
     <fragment android:id="@+id/patientAlertsFragment" android:name="com.example.mobicare.patientAlertsFragment" android:label="My Alerts" />
 
