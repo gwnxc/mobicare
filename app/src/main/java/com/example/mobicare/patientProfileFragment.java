@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +51,7 @@ public class patientProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // ---> ROBUST LOGIN CHECK: Tries both spellings to prevent getting stuck on "Loading..." <---
+        // ---> ROBUST LOGIN CHECK <---
         SharedPreferences prefs = requireActivity().getSharedPreferences("MobiCarePrefs", Context.MODE_PRIVATE);
         loggedInUserId = prefs.getString("loggedUserKey", null);
 
@@ -75,7 +76,6 @@ public class patientProfileFragment extends Fragment {
         tvProfileEmail = view.findViewById(R.id.tvPatientDOB);
         tvProfileAddress = view.findViewById(R.id.tvPatientAddress);
 
-        // ---> BULLETPROOF UI: Using 'View' ensures this never throws a ClassCastException <---
         View btnEditProfile = view.findViewById(R.id.btnEditProfile);
         View btnChangePassword = view.findViewById(R.id.btnChangePassword);
         View btnLogout = view.findViewById(R.id.btnLogout);
@@ -98,19 +98,60 @@ public class patientProfileFragment extends Fragment {
             });
         }
 
-        // Setup Bottom Navigation
-        LinearLayout navHome = view.findViewById(R.id.nav_home);
-        LinearLayout navAlerts = view.findViewById(R.id.nav_alerts);
-        LinearLayout navProfile = view.findViewById(R.id.nav_profile);
-
-        if (navHome != null) navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.patientDashboardFragment));
-        if (navAlerts != null) navAlerts.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.patientAlertsFragment));
-        if (navProfile != null) navProfile.setOnClickListener(v -> {}); // Already here
+        // --- Bottom Navigation Setup ---
+        setupBottomNavigation(view);
 
         if (loggedInUserId != null && !loggedInUserId.isEmpty()) {
             fetchPatientProfile();
         } else {
             Toast.makeText(getContext(), "Session error. Please log in again.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void setupBottomNavigation(View view) {
+        LinearLayout navHome = view.findViewById(R.id.nav_home);
+        LinearLayout navAlerts = view.findViewById(R.id.nav_alerts);
+        LinearLayout navProfile = view.findViewById(R.id.nav_profile);
+
+        // Define colors matching your XML
+        int activeColor = Color.parseColor("#155A91"); // trust_blue
+        int inactiveColor = Color.parseColor("#8E8E8E"); // cool_grey
+
+        if (navHome != null) {
+            // Set Home to inactive
+            ((ImageView) navHome.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navHome.getChildAt(1)).setTextColor(inactiveColor);
+
+            navHome.setOnClickListener(v ->
+                    Navigation.findNavController(view).navigate(R.id.patientDashboardFragment)
+            );
+        }
+
+        if (navAlerts != null) {
+            // Set Alerts to inactive
+            View alertsIconContainer = navAlerts.getChildAt(0);
+            if(alertsIconContainer instanceof android.widget.FrameLayout) {
+                View icon = ((android.widget.FrameLayout) alertsIconContainer).getChildAt(0);
+                if(icon instanceof ImageView) {
+                    ((ImageView) icon).setColorFilter(inactiveColor);
+                }
+            } else if (alertsIconContainer instanceof ImageView) {
+                ((ImageView) alertsIconContainer).setColorFilter(inactiveColor);
+            }
+            ((TextView) navAlerts.getChildAt(1)).setTextColor(inactiveColor);
+
+            navAlerts.setOnClickListener(v ->
+                    Navigation.findNavController(view).navigate(R.id.patientAlertsFragment)
+            );
+        }
+
+        if (navProfile != null) {
+            // Set Profile to ACTIVE (Current Screen)
+            ((ImageView) navProfile.getChildAt(0)).setColorFilter(activeColor);
+            ((TextView) navProfile.getChildAt(1)).setTextColor(activeColor);
+
+            // Do nothing on click since we are already here
+            navProfile.setOnClickListener(v -> {});
         }
     }
 
@@ -155,11 +196,9 @@ public class patientProfileFragment extends Fragment {
         EditText etPhone = dialogView.findViewById(R.id.etEditPhone);
         EditText etAddress = dialogView.findViewById(R.id.etEditAddress);
 
-        // ---> BULLETPROOF FIX: Using 'View' for popup buttons <---
         View btnCancel = dialogView.findViewById(R.id.btnCancel);
         View btnSave = dialogView.findViewById(R.id.btnSave);
 
-        // Pre-fill current data
         if(etName != null) etName.setText(currentName);
         if(etPhone != null) etPhone.setText(currentPhone);
         if(etAddress != null) etAddress.setText(currentAddress);
@@ -187,7 +226,7 @@ public class patientProfileFragment extends Fragment {
                     if (task.isSuccessful()) {
                         Toast.makeText(getContext(), "Profile updated!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-                        fetchPatientProfile(); // Refresh the screen with new data!
+                        fetchPatientProfile();
                     } else {
                         Toast.makeText(getContext(), "Update failed.", Toast.LENGTH_SHORT).show();
                     }
@@ -212,7 +251,6 @@ public class patientProfileFragment extends Fragment {
         EditText etNewPassword = dialogView.findViewById(R.id.etNewPassword);
         EditText etConfirmPassword = dialogView.findViewById(R.id.etConfirmPassword);
 
-        // ---> BULLETPROOF FIX: Using 'View' for popup buttons <---
         View btnCancel = dialogView.findViewById(R.id.btnCancel);
         View btnUpdate = dialogView.findViewById(R.id.btnUpdate);
 

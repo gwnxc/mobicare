@@ -147,9 +147,10 @@ public class patientDashboardFragment extends Fragment {
         TextView tvAlertBadgeCount = view.findViewById(R.id.tvAlertBadgeCount);
 
         // 1. Children Count
+        // 1. Children Count
         if (tvChildrenCount != null) {
             FirebaseDatabase.getInstance().getReference("Patients_Children")
-                    .orderByChild("motherId").equalTo(loggedInUserId)
+                    .orderByChild("parentUid").equalTo(loggedInUserId) // ---> FIXED KEY HERE <---
                     .addValueEventListener(new ValueEventListener() {
                         @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                             tvChildrenCount.setText(String.valueOf(snapshot.getChildrenCount()));

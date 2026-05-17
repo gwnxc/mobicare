@@ -62,8 +62,58 @@ public class patientAlertsFragment extends Fragment {
         tvUnreadCountLabel = view.findViewById(R.id.tvUnreadCountLabel);
         tvEmptyState = view.findViewById(R.id.tvEmptyState);
 
+        // --- Bottom Navigation Setup ---
+        setupBottomNavigation(view);
+
         if (loggedInUserId != null) {
             fetchNotifications();
+        }
+    }
+
+    private void setupBottomNavigation(View view) {
+        LinearLayout navHome = view.findViewById(R.id.nav_home);
+        LinearLayout navAlerts = view.findViewById(R.id.nav_alerts);
+        LinearLayout navProfile = view.findViewById(R.id.nav_profile);
+
+        // Define colors matching your XML
+        int activeColor = Color.parseColor("#155A91"); // trust_blue
+        int inactiveColor = Color.parseColor("#8E8E8E"); // cool_grey
+
+        if (navHome != null) {
+            // Set Home to inactive
+            ((ImageView) navHome.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navHome.getChildAt(1)).setTextColor(inactiveColor);
+
+            navHome.setOnClickListener(v ->
+                    Navigation.findNavController(view).navigate(R.id.patientDashboardFragment)
+            );
+        }
+
+        if (navAlerts != null) {
+            // Set Alerts to Active (Current Screen)
+            View alertsIconContainer = navAlerts.getChildAt(0);
+            if(alertsIconContainer instanceof android.widget.FrameLayout) {
+                View icon = ((android.widget.FrameLayout) alertsIconContainer).getChildAt(0);
+                if(icon instanceof ImageView) {
+                    ((ImageView) icon).setColorFilter(activeColor);
+                }
+            } else if (alertsIconContainer instanceof ImageView) {
+                ((ImageView) alertsIconContainer).setColorFilter(activeColor);
+            }
+            ((TextView) navAlerts.getChildAt(1)).setTextColor(activeColor);
+
+            // Do nothing on click since we are already here
+            navAlerts.setOnClickListener(v -> {});
+        }
+
+        if (navProfile != null) {
+            // Set Profile to inactive
+            ((ImageView) navProfile.getChildAt(0)).setColorFilter(inactiveColor);
+            ((TextView) navProfile.getChildAt(1)).setTextColor(inactiveColor);
+
+            navProfile.setOnClickListener(v ->
+                    Navigation.findNavController(view).navigate(R.id.patientProfileFragment)
+            );
         }
     }
 
@@ -74,6 +124,8 @@ public class patientAlertsFragment extends Fragment {
         notifsRef.orderByChild("receiverUid").equalTo(loggedInUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!isAdded()) return; // Prevent crashes if fragment is detached
+
                 unreadList.clear();
                 readList.clear();
 
@@ -105,12 +157,16 @@ public class patientAlertsFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load notifications", Toast.LENGTH_SHORT).show();
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Failed to load notifications", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
     private void updateUI() {
+        if (!isAdded() || llNewNotifs == null || llEarlierNotifs == null) return;
+
         llNewNotifs.removeAllViews();
         llEarlierNotifs.removeAllViews();
 

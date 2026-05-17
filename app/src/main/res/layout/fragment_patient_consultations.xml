@@ -9,10 +9,11 @@
 
     <View
         android:id="@+id/headerView"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_width="414dp"
+        android:layout_height="124dp"
         android:background="#1976D2"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="-3dp" />
 
     <ImageView
         android:id="@+id/btnBack"

@@ -11,7 +11,7 @@
         android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation">
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationPatient">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -314,10 +314,10 @@
     </androidx.core.widget.NestedScrollView>
 
     <include
-        android:id="@+id/bottomNavigation"
-        layout="@layout/layout_bottom_nav_admin"
+        android:id="@+id/bottomNavigationPatient"
+        layout="@layout/layout_bottom_nav_patient"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

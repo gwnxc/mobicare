@@ -118,7 +118,7 @@
         android:id="@+id/adminAlertsFragment"
         android:name="com.example.mobicare.alert"
         android:label="Admin Alerts"
-        tools:layout="@layout/alert">
+        tools:layout="@layout/fragment_alert">
         <action android:id="@+id/action_adminAlertsFragment_to_adminDashboardFragment" app:destination="@id/adminDashboardFragment" />
         <action android:id="@+id/action_adminAlertsFragment_to_inventoryFragment" app:destination="@id/inventoryFragment" />
         <action android:id="@+id/action_adminAlertsFragment_to_adminProfileFragment" app:destination="@id/adminProfileFragment" />
