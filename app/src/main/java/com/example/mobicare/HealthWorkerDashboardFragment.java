@@ -38,7 +38,7 @@ import java.util.Locale;
 public class HealthWorkerDashboardFragment extends Fragment {
 
     private TextView tvChildrenCount, tvMotherCount, tvUpcomingCount;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabase; // Keeps track of Root
     private String currentUid = "";
     private ImageView btnLogout;
     private View slot1, slot2, slot3;
@@ -53,7 +53,7 @@ public class HealthWorkerDashboardFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // We initialize Firebase early to check data
+        // Keep mDatabase pointed strictly to the ROOT
         mDatabase = FirebaseDatabase.getInstance().getReference();
         return inflater.inflate(R.layout.fragment_health_worker_dashboard, container, false);
     }
@@ -65,16 +65,11 @@ public class HealthWorkerDashboardFragment extends Fragment {
         android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
         currentUid = prefs.getString("loggedUserKey", "");
 
-        // Point to the Users node in Firebase
-        mDatabase = FirebaseDatabase.getInstance().getReference("Users");
-
         // 1. Initialize Views
         tvChildrenCount = view.findViewById(R.id.tvChildrenCountDashboard);
         tvMotherCount = view.findViewById(R.id.tvMotherCountDashboard);
         tvUpcomingCount = view.findViewById(R.id.tvUpcomingCountDashboard);
-
         btnLogout = view.findViewById(R.id.btnLogout);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         // 2. Initialize Activity Slots
         slot1 = view.findViewById(R.id.activity1);
@@ -109,7 +104,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
 
         if(btnLogout != null) btnLogout.setOnClickListener(v -> showLogoutConfirmation());
 
-        // Link to UI Elements
         llWorkerList = view.findViewById(R.id.llWorkerList);
         tvCount = view.findViewById(R.id.tvCount);
 
@@ -123,27 +117,21 @@ public class HealthWorkerDashboardFragment extends Fragment {
             btnAddWorker.setOnClickListener(v -> showAddWorkerDialog());
         }
 
-        // ---> FIXED: CLEANED UP DUPLICATE BOTTOM NAVIGATION LOGIC <---
         BottomNavigationView bottomNav = view.findViewById(R.id.bottomNavHealthWorker);
         if (bottomNav != null) {
             bottomNav.setOnItemSelectedListener(item -> {
                 int id = item.getItemId();
-
                 if (id == R.id.healthWorkerDashboardFragment) {
-                    // They clicked Home. We are already on the Dashboard, so do nothing.
                     return true;
                 }
                 else if (id == R.id.addConsultationFragment) {
-                    // They clicked Add. Navigate to the Add Consultation screen.
                     Navigation.findNavController(view).navigate(R.id.action_dashboard_to_addConsultation);
                     return true;
                 }
                 else if (id == R.id.profileFragment) {
-                    // They clicked Profile. Navigate to the Health Worker Profile screen.
                     Navigation.findNavController(view).navigate(R.id.profileFragment);
                     return true;
                 }
-
                 return false;
             });
         }
@@ -203,9 +191,10 @@ public class HealthWorkerDashboardFragment extends Fragment {
                 map.put("role", "Health Worker");
                 map.put("registrationDate", System.currentTimeMillis());
 
-                String uniqueId = mDatabase.push().getKey();
+                // FIXED: Explicitly push under the "Users" directory node
+                String uniqueId = mDatabase.child("Users").push().getKey();
                 if (uniqueId != null) {
-                    mDatabase.child(uniqueId).setValue(map).addOnCompleteListener(task -> {
+                    mDatabase.child("Users").child(uniqueId).setValue(map).addOnCompleteListener(task -> {
                         if(task.isSuccessful()){
                             Toast.makeText(getContext(), "Health Worker Added!", Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
@@ -225,7 +214,8 @@ public class HealthWorkerDashboardFragment extends Fragment {
     }
 
     private void fetchHealthWorkers() {
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        // FIXED: Point specifically to the "Users" node
+        mDatabase.child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (llWorkerList != null) llWorkerList.removeAllViews();
@@ -278,115 +268,12 @@ public class HealthWorkerDashboardFragment extends Fragment {
 
         card.findViewById(R.id.btnEdit).setOnClickListener(v -> Toast.makeText(getContext(), "Edit feature coming soon for " + name, Toast.LENGTH_SHORT).show());
         card.findViewById(R.id.btnDelete).setOnClickListener(v -> {
-            mDatabase.child(uniqueId).removeValue();
+            // FIXED: Explicitly delete from the "Users" path node
+            mDatabase.child("Users").child(uniqueId).removeValue();
             Toast.makeText(getContext(), "Deleted " + name, Toast.LENGTH_SHORT).show();
         });
 
         if (llWorkerList != null) llWorkerList.addView(card);
-    }
-
-    private void listenForRecentActivities() {
-        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
-        String uid = (user != null) ? user.getUid() : (currentUid != null ? currentUid : "");
-
-        if (uid.isEmpty()) return;
-
-        mDatabase.child("Recent_Activities").child(uid)
-                .orderByChild("timestamp").limitToLast(3)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (!isAdded()) return;
-
-                        if (!snapshot.exists()) {
-                            if(slot1 != null) slot1.setVisibility(View.GONE);
-                            return;
-                        }
-
-                        java.util.List<DataSnapshot> activities = new java.util.ArrayList<>();
-                        for (DataSnapshot ds : snapshot.getChildren()) activities.add(ds);
-                        java.util.Collections.reverse(activities);
-
-                        if(slot1 != null) slot1.setVisibility(View.GONE);
-                        if(slot2 != null) slot2.setVisibility(View.GONE);
-                        if(slot3 != null) slot3.setVisibility(View.GONE);
-
-                        for (int i = 0; i < activities.size(); i++) {
-                            DataSnapshot ds = activities.get(i);
-                            String type = ds.child("type").getValue(String.class);
-                            String desc = ds.child("description").getValue(String.class);
-                            Long timestamp = ds.child("timestamp").getValue(Long.class);
-
-                            String timeStr = "Just now";
-                            if (timestamp != null) {
-                                timeStr = DateUtils.getRelativeTimeSpanString(timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString();
-                            }
-
-                            if (i == 0 && slot1 != null) {
-                                slot1.setVisibility(View.VISIBLE);
-                                updateActivitySlot(slot1, type, desc, timeStr);
-                            } else if (i == 1 && slot2 != null) {
-                                slot2.setVisibility(View.VISIBLE);
-                                updateActivitySlot(slot2, type, desc, timeStr);
-                            } else if (i == 2 && slot3 != null) {
-                                slot3.setVisibility(View.VISIBLE);
-                                updateActivitySlot(slot3, type, desc, timeStr);
-                            }
-                        }
-                    }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {}
-                });
-    }
-
-    private void updateActivitySlot(View row, String type, String details, String time) {
-        if (row == null || type == null) return;
-        TextView title = row.findViewById(R.id.tvActivityTitle);
-        TextView subtitle = row.findViewById(R.id.tvActivitySubtitle);
-        TextView timeStamp = row.findViewById(R.id.tvActivityTime);
-        ImageView icon = row.findViewById(R.id.ivActivityIcon);
-
-        if(title != null) title.setText(type);
-        if(subtitle != null) subtitle.setText(details);
-        if(timeStamp != null) timeStamp.setText(time);
-
-        if (icon != null) {
-            switch (type) {
-                case "Patient Registered":
-                    icon.setImageResource(R.drawable.ic_profile);
-                    icon.setBackgroundResource(R.drawable.circle_light_blue);
-                    icon.setColorFilter(Color.parseColor("#155A91"));
-                    break;
-                case "Immunization":
-                case "Postnatal Care":
-                    icon.setImageResource(R.drawable.ic_add_record);
-                    icon.setBackgroundResource(R.drawable.circle_light_green);
-                    icon.setColorFilter(Color.parseColor("#4CAF50"));
-                    break;
-                case "Consultation":
-                    icon.setImageResource(R.drawable.ic_consultation);
-                    icon.setBackgroundResource(R.drawable.circle_light_blue);
-                    icon.setColorFilter(Color.parseColor("#155A91"));
-                    break;
-            }
-        }
-    }
-
-    private void showLogoutConfirmation() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_logout, null);
-        builder.setView(dialogView);
-        AlertDialog dialog = builder.create();
-
-        if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-
-        dialogView.findViewById(R.id.btnCancelLogout).setOnClickListener(v -> dialog.dismiss());
-        dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
-            dialog.dismiss();
-            FirebaseAuth.getInstance().signOut();
-            Navigation.findNavController(requireView()).navigate(R.id.loginFragment);
-            Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
-        });
-        dialog.show();
     }
 
     private void fetchHealthWorkerProfile() {
@@ -394,7 +281,9 @@ public class HealthWorkerDashboardFragment extends Fragment {
         String userKey = prefs.getString("loggedUserKey", "");
 
         if (!userKey.isEmpty()) {
-            mDatabase.child("HealthWorkers").child(userKey).addValueEventListener(new ValueEventListener() {
+            // NOTE: Make sure your login screen saves health workers to "Users" or "HealthWorkers".
+            // If they are saved under "Users", change this path to .child("Users").child(userKey)
+            mDatabase.child("Users").child(userKey).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists() && isAdded()) {
@@ -410,52 +299,100 @@ public class HealthWorkerDashboardFragment extends Fragment {
         }
     }
 
+    // ... (The rest of your activity/stat/notification logic remains the same)
+    private void listenForRecentActivities() {
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        String uid = (user != null) ? user.getUid() : (currentUid != null ? currentUid : "");
+        if (uid.isEmpty()) return;
+
+        mDatabase.child("Recent_Activities").child(uid).orderByChild("timestamp").limitToLast(3).addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!isAdded() || !snapshot.exists()) { if(slot1 != null) slot1.setVisibility(View.GONE); return; }
+                java.util.List<DataSnapshot> activities = new java.util.ArrayList<>();
+                for (DataSnapshot ds : snapshot.getChildren()) activities.add(ds);
+                java.util.Collections.reverse(activities);
+                if(slot1 != null) slot1.setVisibility(View.GONE);
+                if(slot2 != null) slot2.setVisibility(View.GONE);
+                if(slot3 != null) slot3.setVisibility(View.GONE);
+                for (int i = 0; i < activities.size(); i++) {
+                    DataSnapshot ds = activities.get(i);
+                    String type = ds.child("type").getValue(String.class);
+                    String desc = ds.child("description").getValue(String.class);
+                    Long timestamp = ds.child("timestamp").getValue(Long.class);
+                    String timeStr = timestamp != null ? DateUtils.getRelativeTimeSpanString(timestamp, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS).toString() : "Just now";
+                    if (i == 0 && slot1 != null) { slot1.setVisibility(View.VISIBLE); updateActivitySlot(slot1, type, desc, timeStr); }
+                    else if (i == 1 && slot2 != null) { slot2.setVisibility(View.VISIBLE); updateActivitySlot(slot2, type, desc, timeStr); }
+                    else if (i == 2 && slot3 != null) { slot3.setVisibility(View.VISIBLE); updateActivitySlot(slot3, type, desc, timeStr); }
+                }
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void updateActivitySlot(View row, String type, String details, String time) {
+        if (row == null || type == null) return;
+        TextView title = row.findViewById(R.id.tvActivityTitle);
+        TextView subtitle = row.findViewById(R.id.tvActivitySubtitle);
+        TextView timeStamp = row.findViewById(R.id.tvActivityTime);
+        ImageView icon = row.findViewById(R.id.ivActivityIcon);
+        if(title != null) title.setText(type);
+        if(subtitle != null) subtitle.setText(details);
+        if(timeStamp != null) timeStamp.setText(time);
+        if (icon != null) {
+            switch (type) {
+                case "Patient Registered": icon.setImageResource(R.drawable.ic_profile); icon.setBackgroundResource(R.drawable.circle_light_blue); icon.setColorFilter(Color.parseColor("#155A91")); break;
+                case "Immunization": case "Postnatal Care": icon.setImageResource(R.drawable.ic_add_record); icon.setBackgroundResource(R.drawable.circle_light_green); icon.setColorFilter(Color.parseColor("#4CAF50")); break;
+                case "Consultation": icon.setImageResource(R.drawable.ic_consultation); icon.setBackgroundResource(R.drawable.circle_light_blue); icon.setColorFilter(Color.parseColor("#155A91")); break;
+            }
+        }
+    }
+
+    private void showLogoutConfirmation() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_logout, null);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialogView.findViewById(R.id.btnCancelLogout).setOnClickListener(v -> dialog.dismiss());
+        dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
+            dialog.dismiss(); FirebaseAuth.getInstance().signOut();
+            Navigation.findNavController(requireView()).navigate(R.id.loginFragment);
+            Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
+        });
+        dialog.show();
+    }
+
     private void fetchDashboardStats() {
         mDatabase.child("Patients_Guardians").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (isAdded() && tvMotherCount != null) tvMotherCount.setText(String.valueOf(snapshot.getChildrenCount()));
-            }
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) { if (isAdded() && tvMotherCount != null) tvMotherCount.setText(String.valueOf(snapshot.getChildrenCount())); }
             @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
-
         mDatabase.child("Patients_Children").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (isAdded() && tvChildrenCount != null) tvChildrenCount.setText(String.valueOf(snapshot.getChildrenCount()));
-            }
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) { if (isAdded() && tvChildrenCount != null) tvChildrenCount.setText(String.valueOf(snapshot.getChildrenCount())); }
             @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
-
-        mDatabase.child("Consultations").orderByChild("status").equalTo("scheduled")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (isAdded() && tvUpcomingCount != null) tvUpcomingCount.setText(String.valueOf(snapshot.getChildrenCount()));
-                    }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {}
-                });
+        mDatabase.child("Consultations").orderByChild("status").equalTo("scheduled").addValueEventListener(new ValueEventListener() {
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) { if (isAdded() && tvUpcomingCount != null) tvUpcomingCount.setText(String.valueOf(snapshot.getChildrenCount())); }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
     private void listenForNotifications() {
         com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
         String uid = (user != null) ? user.getUid() : (currentUid != null ? currentUid : "");
-
         if (!uid.isEmpty()) {
-            mDatabase.child("Notifications").orderByChild("receiverUid").equalTo(uid)
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (!isAdded()) return;
-                            int unreadCount = 0;
-                            for (DataSnapshot ds : snapshot.getChildren()) {
-                                Boolean isRead = ds.child("isRead").getValue(Boolean.class);
-                                if (isRead != null && !isRead) unreadCount++;
-                            }
-                            updateDashboardBadge(unreadCount);
-                        }
-                        @Override public void onCancelled(@NonNull DatabaseError error) {}
-                    });
+            mDatabase.child("Notifications").orderByChild("receiverUid").equalTo(uid).addValueEventListener(new ValueEventListener() {
+                @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (!isAdded()) return;
+                    int unreadCount = 0;
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        Boolean isRead = ds.child("isRead").getValue(Boolean.class);
+                        if (isRead != null && !isRead) unreadCount++;
+                    }
+                    updateDashboardBadge(unreadCount);
+                }
+                @Override public void onCancelled(@NonNull DatabaseError error) {}
+            });
         }
     }
 
@@ -463,12 +400,8 @@ public class HealthWorkerDashboardFragment extends Fragment {
         if (getView() == null) return;
         TextView tvCardBadge = getView().findViewById(R.id.tvBadge);
         if (tvCardBadge != null) {
-            if (count > 0) {
-                tvCardBadge.setVisibility(View.VISIBLE);
-                tvCardBadge.setText(String.valueOf(count));
-            } else {
-                tvCardBadge.setVisibility(View.GONE);
-            }
+            if (count > 0) { tvCardBadge.setVisibility(View.VISIBLE); tvCardBadge.setText(String.valueOf(count)); }
+            else { tvCardBadge.setVisibility(View.GONE); }
         }
     }
 }
