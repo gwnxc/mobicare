@@ -2,6 +2,7 @@ package com.example.mobicare;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -31,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 // Removed duplicate UserAccount class from top and placed only at the bottom
 
@@ -81,6 +85,7 @@ public class AddConsultationFragment extends Fragment {
     private int selectedPosition = -1;
     private String currentRecordType = "Consultation";
     private String currentUid = "";
+    private String selectedChildBirthdate = "";
 
     @Nullable
     @Override
@@ -134,8 +139,10 @@ public class AddConsultationFragment extends Fragment {
         etDate.setOnClickListener(v -> showDatePicker(etDate));
         etTime.setOnClickListener(v -> showTimePicker());
         etDateAdministered.setOnClickListener(v -> showDatePicker(etDateAdministered));
-        if (etNextImmDate != null) etNextImmDate.setOnClickListener(v -> showDatePicker(etNextImmDate));
-        if (etReturnCheckup != null) etReturnCheckup.setOnClickListener(v -> showDatePicker(etReturnCheckup));
+        if (etNextImmDate != null)
+            etNextImmDate.setOnClickListener(v -> showDatePicker(etNextImmDate));
+        if (etReturnCheckup != null)
+            etReturnCheckup.setOnClickListener(v -> showDatePicker(etReturnCheckup));
 
         // Tab Switching
         cardConsultation.setOnClickListener(v -> switchTab("Consultation"));
@@ -145,6 +152,8 @@ public class AddConsultationFragment extends Fragment {
 
         btnSave.setOnClickListener(v -> validateAndSave());
         cardConsultation.performClick();
+
+        setupHealthWorkerNavigation(view, "add");
     }
 
     private void initConsultationFields(View view) {
@@ -223,6 +232,8 @@ public class AddConsultationFragment extends Fragment {
             String selectedChildName = (String) parent.getItemAtPosition(pos);
             linkedPatientUid = "";
             selectedPosition = -1;
+            selectedChildBirthdate = ""; // Reset variable
+
             String guardianName = childGuardianMap.get(selectedChildName.trim());
 
             for (int i = 0; i < patientAccountList.size(); i++) {
@@ -230,11 +241,17 @@ public class AddConsultationFragment extends Fragment {
                 if (account.name.equalsIgnoreCase(selectedChildName)) {
                     selectedPosition = i;
                     linkedPatientUid = account.uid;
+                    selectedChildBirthdate = account.birthdate; // 1. Store child birthdate
+// Paste this inside your autoCompleteChild listener loop right under: selectedChildBirthdate = account.birthdate;
+                    Toast.makeText(getContext(), "Selected Birthdate: " + selectedChildBirthdate, Toast.LENGTH_SHORT).show();
+
                     if (guardianName != null && !guardianName.isEmpty()) {
                         autoCompleteMother.setText(guardianName);
                     } else {
                         autoCompleteMother.setText("Guardian Not Found");
                     }
+
+                    autoCalculateNextImmunizationDate(); // 2. Run auto-calculator function
                     break;
                 }
             }
@@ -251,7 +268,7 @@ public class AddConsultationFragment extends Fragment {
                 patientNames.clear();
                 patientAccountList.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    String name, uid;
+                    String name, uid, bdate = ""; // Added bdate initialization
                     if (type.equals("Parent/Guardian")) {
                         name = ds.child("fullName").getValue(String.class);
                         uid = ds.child("linkedUid").getValue(String.class);
@@ -260,17 +277,21 @@ public class AddConsultationFragment extends Fragment {
                         String lName = ds.child("lastName").getValue(String.class);
                         name = (fName != null ? fName : "") + " " + (lName != null ? lName : "");
                         uid = ds.child("parentUid").getValue(String.class);
+                        bdate = ds.child("birthDate").getValue(String.class); // 1. Read birthdate from Firebase
                     }
                     if (name != null && uid != null) {
                         patientNames.add(name);
-                        patientAccountList.add(new UserAccount(name, ds.getKey(), uid));
+                        patientAccountList.add(new UserAccount(name, ds.getKey(), uid, bdate)); // 2. Pass bdate here
                     }
                 }
 
                 patientAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, patientNames);
                 autoCompletePatient.setAdapter(patientAdapter);
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
@@ -309,9 +330,13 @@ public class AddConsultationFragment extends Fragment {
                     }
                 }
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
+
     private void setupMedicineAutocomplete() {
         mDatabase.child("Inventory").addValueEventListener(new ValueEventListener() {
             @Override
@@ -322,7 +347,10 @@ public class AddConsultationFragment extends Fragment {
                     String name = ds.child("itemName").getValue(String.class);
                     String qtyStr = ds.child("quantity").getValue(String.class);
                     int qty = 0;
-                    try { qty = Integer.parseInt(qtyStr); } catch (Exception ignored) {}
+                    try {
+                        qty = Integer.parseInt(qtyStr);
+                    } catch (Exception ignored) {
+                    }
                     if (name != null && qty > 0) {
                         availableMeds.add(name);
                         medicineInventoryMap.put(name, ds);
@@ -332,7 +360,10 @@ public class AddConsultationFragment extends Fragment {
                     autoCompleteMedicine.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, availableMeds));
                 }
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
@@ -423,7 +454,11 @@ public class AddConsultationFragment extends Fragment {
         if (targetVaccineSnapshot != null) {
             String qtyStr = targetVaccineSnapshot.child("quantity").getValue(String.class);
             int currentStock = 0;
-            try { currentStock = Integer.parseInt(qtyStr); } catch (Exception e) { currentStock = 0; }
+            try {
+                currentStock = Integer.parseInt(qtyStr);
+            } catch (Exception e) {
+                currentStock = 0;
+            }
 
             if (currentStock <= 0) {
                 Toast.makeText(getContext(), "Out of Stock: " + selectedVaccine, Toast.LENGTH_SHORT).show();
@@ -452,6 +487,7 @@ public class AddConsultationFragment extends Fragment {
         data.put("nextSchedule", etNextImmDate.getText().toString());
         data.put("administeredBy", etAdminBy.getText().toString());
         data.put("timestamp", ServerValue.TIMESTAMP);
+        data.put("childId", linkedPatientUid); // Now it will be searchable by ID!
 
         immRef.setValue(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -546,8 +582,7 @@ public class AddConsultationFragment extends Fragment {
                 return;
             }
             saveConsultationRecord();
-        }
-        else if (currentRecordType.equals("Prenatal")) {
+        } else if (currentRecordType.equals("Prenatal")) {
             // FIX: Added this block to handle Prenatal saves
             String worker = etHealthWorker.getText().toString().trim();
             if (commonPatient.isEmpty() || linkedPatientUid.isEmpty()) {
@@ -559,8 +594,7 @@ public class AddConsultationFragment extends Fragment {
                 return;
             }
             savePrenatalRecord();
-        }
-        else if (currentRecordType.equals("Medicine")) {
+        } else if (currentRecordType.equals("Medicine")) {
             String med = autoCompleteMedicine.getText().toString().trim();
             String qty = etMedQty.getText().toString().trim();
             String worker = etDispensedBy.getText().toString().trim(); // New check
@@ -578,8 +612,7 @@ public class AddConsultationFragment extends Fragment {
                 return;
             }
             saveMedicineRecord();
-        }
-        else if (currentRecordType.equals("Immunization")) {
+        } else if (currentRecordType.equals("Immunization")) {
             String worker = etAdminBy.getText().toString().trim(); // New check
             if (autoCompleteChild.getText().toString().isEmpty()) {
                 autoCompleteChild.setError("Select child first");
@@ -589,11 +622,19 @@ public class AddConsultationFragment extends Fragment {
                 etAdminBy.setError("Administered by required");
                 return;
             }
-            saveImmunizationRecord();
+            else if (currentRecordType.equals("Immunization")) {
+                String vaccine = spinnerVaccineType.getSelectedItem().toString();
+                String dose = spinnerDoseNo.getSelectedItem().toString();
+
+                // Check for duplicates before allowing the save
+                checkDuplicateImmunization(vaccine, dose, () -> {
+                    saveImmunizationRecord();
+                });
+            }
         }
     }
 
-   private void loadImmunizationData() {
+    private void loadImmunizationData() {
         mDatabase.child("Patients_Children").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -616,10 +657,14 @@ public class AddConsultationFragment extends Fragment {
                                     public void onDataChange(@NonNull DataSnapshot parentSnapshot) {
                                         for (DataSnapshot parentDs : parentSnapshot.getChildren()) {
                                             String motherName = parentDs.child("fullName").getValue(String.class);
-                                            if (motherName != null) childGuardianMap.put(fullName, motherName);
+                                            if (motherName != null)
+                                                childGuardianMap.put(fullName, motherName);
                                         }
                                     }
-                                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    }
                                 });
                     }
                 }
@@ -628,7 +673,10 @@ public class AddConsultationFragment extends Fragment {
                     autoCompleteChild.setAdapter(childAdapter);
                 }
             }
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
@@ -636,10 +684,14 @@ public class AddConsultationFragment extends Fragment {
         String[] types = {"Child", "Parent/Guardian"};
         spinnerPatientType.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, types));
         spinnerPatientType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
+            @Override
+            public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
                 loadPatientsFromFirebase(types[pos]);
             }
-            @Override public void onNothingSelected(AdapterView<?> p) {}
+
+            @Override
+            public void onNothingSelected(AdapterView<?> p) {
+            }
         });
     }
 
@@ -648,6 +700,22 @@ public class AddConsultationFragment extends Fragment {
         spinnerVaccineType.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, vaccines));
         spinnerDoseNo.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, new String[]{"1", "2", "3"}));
         spinnerScheduledAge.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, new String[]{"At birth", "1 ½ months", "2 ½ months", "3 ½ months", "9 months", "1 year"}));
+
+        // Paste this right before the closing bracket of setupImmunizationSpinners()
+        AdapterView.OnItemSelectedListener recalculateListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                autoCalculateNextImmunizationDate();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        };
+        spinnerVaccineType.setOnItemSelectedListener(recalculateListener);
+        spinnerDoseNo.setOnItemSelectedListener(recalculateListener);
+        // Paste this line at the very bottom of your setupImmunizationSpinners() method
+        spinnerScheduledAge.setOnItemSelectedListener(recalculateListener);
     }
 
     private void highlightCard(com.google.android.material.card.MaterialCardView card, String color, String bgColor) {
@@ -695,14 +763,203 @@ public class AddConsultationFragment extends Fragment {
             etTime.setText(String.format(Locale.getDefault(), "%02d:%02d %s", h12, m, ampm));
         }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show();
     }
-}
+
+    // ---> MOVED METHOD OUT OF USERACCOUNT AND DROPPED INSIDE FRAGMENT CLASS PROPER SCOPE <---
+    private void setupHealthWorkerNavigation(View view, String activeTab) {
+        View navBarContainer = view.findViewById(R.id.healthWorkerNavBar);
+        if (navBarContainer == null) return;
+
+        LinearLayout customNavHome = navBarContainer.findViewById(R.id.nav_home);
+        LinearLayout customNavConsultations = navBarContainer.findViewById(R.id.nav_consultations_tab);
+        LinearLayout customNavAddRecord = navBarContainer.findViewById(R.id.nav_add_record_tab);
+        LinearLayout customNavNotifications = navBarContainer.findViewById(R.id.nav_notifications_tab);
+        LinearLayout customNavProfile = navBarContainer.findViewById(R.id.nav_profile_tab);
+
+        if (activeTab.equals("home")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_home, R.id.tv_nav_home);
+        } else if (activeTab.equals("consultations")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_consultations, R.id.tv_nav_consultations);
+        } else if (activeTab.equals("add")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_add, R.id.tv_nav_add);
+        } else if (activeTab.equals("alerts")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_alerts, R.id.tv_nav_alerts);
+        } else if (activeTab.equals("profile")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_profile, R.id.tv_nav_profile);
+        }
+
+        if (customNavHome != null) {
+            customNavHome.setOnClickListener(v -> {
+                if (!activeTab.equals("home")) {
+                    Navigation.findNavController(view).navigate(R.id.healthWorkerDashboardFragment);
+                }
+            });
+        }
+
+        if (customNavConsultations != null) {
+            customNavConsultations.setOnClickListener(v -> {
+                if (!activeTab.equals("consultations")) {
+                    Navigation.findNavController(view).navigate(R.id.consultationsFragment);
+                }
+            });
+        }
+
+        if (customNavAddRecord != null) {
+            customNavAddRecord.setOnClickListener(v -> {
+                if (!activeTab.equals("add")) {
+                    Navigation.findNavController(view).navigate(R.id.addConsultationFragment);
+                }
+            });
+        }
+
+        if (customNavNotifications != null) {
+            customNavNotifications.setOnClickListener(v -> {
+                if (!activeTab.equals("alerts")) {
+                    Navigation.findNavController(view).navigate(R.id.alertsFragment);
+                }
+            });
+        }
+
+        if (customNavProfile != null) {
+            customNavProfile.setOnClickListener(v -> {
+                if (!activeTab.equals("profile")) {
+                    Navigation.findNavController(view).navigate(R.id.profileFragment);
+                }
+            });
+        }
+    }
+
+    private void highlightActiveTab(View parentView, int iconResId, int textResId) {
+        ImageView icon = parentView.findViewById(iconResId);
+        TextView text = parentView.findViewById(textResId);
+        if (icon != null) icon.setColorFilter(Color.parseColor("#2D79D1"));
+        if (text != null) {
+            text.setTextColor(Color.parseColor("#2D79D1"));
+            text.setTypeface(null, android.graphics.Typeface.BOLD);
+        }
+    }
+
+    private void autoCalculateNextImmunizationDate() {
+        String baseDateStr = "";
+
+        // 1. If we have a child birthdate, use it.
+        if (selectedChildBirthdate != null && !selectedChildBirthdate.isEmpty()) {
+            baseDateStr = selectedChildBirthdate;
+        }
+        // 2. FALLBACK: If birthdate is null, use the Date Administered text field instead!
+        else {
+            baseDateStr = etDateAdministered.getText().toString().trim();
+        }
+
+        // If both are empty, exit
+        if (baseDateStr.isEmpty() || baseDateStr.equals("dd/mm/yyyy")) {
+            if (etNextImmDate != null) etNextImmDate.setText("");
+            return;
+        }
+
+        String selectedVaccine = spinnerVaccineType.getSelectedItem().toString();
+        String selectedDose = spinnerDoseNo.getSelectedItem().toString();
+        String scheduledAge = spinnerScheduledAge.getSelectedItem().toString();
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date parsedBaseDate = sdf.parse(baseDateStr);
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(parsedBaseDate);
+
+            int ageWeeksToAdd = 0;
+            int ageMonthsToAdd = 0;
+            boolean needsNextSchedule = true;
+
+            // If using child birthdate, calculate by standard milestone ages
+            if (selectedChildBirthdate != null && !selectedChildBirthdate.isEmpty()) {
+                switch (scheduledAge) {
+                    case "At birth": ageWeeksToAdd = 6; break;       // Next: 1 ½ months old
+                    case "1 ½ months": ageWeeksToAdd = 10; break;    // Next: 2 ½ months old
+                    case "2 ½ months": ageWeeksToAdd = 14; break;    // Next: 3 ½ months old
+                    case "3 ½ months": ageMonthsToAdd = 9; break;    // Next: 9 months old
+                    case "9 months": ageMonthsToAdd = 12; break;     // Next: 1 year old
+                    case "1 year": needsNextSchedule = false; break;
+                    default: needsNextSchedule = false; break;
+                }
+            }
+            // Fallback: If using Date Administered, just add 28 days (4 weeks) for multi-dose runs
+            else {
+                if (selectedVaccine.contains("Pentavalent") || selectedVaccine.contains("OPV") || selectedVaccine.contains("PCV")) {
+                    if (selectedDose.equals("1") || selectedDose.equals("2")) {
+                        ageWeeksToAdd = 4; // Add 4 weeks from today
+                    } else {
+                        needsNextSchedule = false;
+                    }
+                } else if (selectedVaccine.contains("MMR") && selectedDose.equals("1")) {
+                    ageMonthsToAdd = 3; // 3 months to next MMR booster
+                } else {
+                    needsNextSchedule = false;
+                }
+            }
+
+            if (needsNextSchedule) {
+                if (ageWeeksToAdd > 0) {
+                    // If using fallback date administered, weeks to add was set to 4 weeks
+                    if (selectedChildBirthdate == null || selectedChildBirthdate.isEmpty()) {
+                        cal.add(Calendar.WEEK_OF_YEAR, 4);
+                    } else {
+                        cal.add(Calendar.WEEK_OF_YEAR, ageWeeksToAdd);
+                    }
+                } else if (ageMonthsToAdd > 0) {
+                    if (selectedChildBirthdate == null || selectedChildBirthdate.isEmpty()) {
+                        cal.add(Calendar.MONTH, ageMonthsToAdd);
+                    } else {
+                        cal.add(Calendar.MONTH, ageMonthsToAdd);
+                    }
+                }
+                etNextImmDate.setText(sdf.format(cal.getTime()));
+            } else {
+                etNextImmDate.setText("Series Completed / None");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void checkDuplicateImmunization(String vaccine, String dose, Runnable onCheckPassed) {
+        mDatabase.child("Immunizations")
+                .orderByChild("childName")
+                .equalTo(autoCompleteChild.getText().toString().trim())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean exists = false;
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            String existingVaccine = ds.child("vaccineType").getValue(String.class);
+                            String existingDose = ds.child("doseNo").getValue(String.class);
+
+                            if (vaccine.equals(existingVaccine) && dose.equals(existingDose)) {
+                                exists = true;
+                                break;
+                            }
+                        }
+
+                        if (exists) {
+                            Toast.makeText(getContext(), "Duplicate! This dose is already recorded.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            onCheckPassed.run(); // Only run the save logic if no duplicate found
+                        }
+                    }
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                });
+    }
 
 // Fixed UserAccount class placement
 class UserAccount {
-    String name, username, uid;
-    UserAccount(String n, String u, String id) {
+    String name, username, uid, birthdate; // Added birthdate
+
+    UserAccount(String n, String u, String id, String birthdate) { // Updated constructor
         this.name = n;
         this.username = u;
         this.uid = id;
+        this.birthdate = birthdate; // Assigned birthdate
     }
+}
 }

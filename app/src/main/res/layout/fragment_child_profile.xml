@@ -72,7 +72,7 @@
                             android:layout_height="64dp"
                             android:background="@drawable/circle_green"
                             android:padding="14dp"
-                            android:src="@android:drawable/ic_menu_myplaces"
+                            android:src="@drawable/ic_child"
                             app:tint="@color/pure_white" />
 
                         <LinearLayout
@@ -102,45 +102,29 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:background="@drawable/bg_stat_box"
                             android:orientation="vertical"
-                            android:padding="12dp"
-                            android:layout_marginEnd="6dp">
-                            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_today" app:tint="#388E3C" />
+                            android:padding="12dp">
+                            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_calendar" app:tint="#388E3C" />
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Birth Date" android:textSize="10sp" android:textColor="#64748B" />
                             <TextView android:id="@+id/tvProfileBirth" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:layout_marginTop="8dp"
                             android:background="@drawable/bg_stat_box"
                             android:orientation="vertical"
-                            android:padding="12dp"
-                            android:layout_marginHorizontal="6dp">
-                            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_sort_by_size" app:tint="#1976D2" />
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Weight" android:textSize="10sp" android:textColor="#64748B" />
-                            <TextView android:id="@+id/tvProfileWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_stat_box"
-                            android:orientation="vertical"
-                            android:padding="12dp"
-                            android:layout_marginStart="6dp">
-                            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_edit" app:tint="#388E3C" />
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Height" android:textSize="10sp" android:textColor="#64748B" />
-                            <TextView android:id="@+id/tvProfileHeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
+                            android:padding="12dp">
+                            <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@drawable/ic_birthplace" app:tint="#1976D2" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Place of Birth" android:textSize="10sp" android:textColor="#64748B" />
+                            <TextView android:id="@+id/tvProfileBirthPlace" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="#1E293B" android:textSize="14sp" android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>

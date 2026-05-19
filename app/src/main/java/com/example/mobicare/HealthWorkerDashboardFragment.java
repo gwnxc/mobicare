@@ -117,24 +117,8 @@ public class HealthWorkerDashboardFragment extends Fragment {
             btnAddWorker.setOnClickListener(v -> showAddWorkerDialog());
         }
 
-        BottomNavigationView bottomNav = view.findViewById(R.id.bottomNavHealthWorker);
-        if (bottomNav != null) {
-            bottomNav.setOnItemSelectedListener(item -> {
-                int id = item.getItemId();
-                if (id == R.id.healthWorkerDashboardFragment) {
-                    return true;
-                }
-                else if (id == R.id.addConsultationFragment) {
-                    Navigation.findNavController(view).navigate(R.id.action_dashboard_to_addConsultation);
-                    return true;
-                }
-                else if (id == R.id.profileFragment) {
-                    Navigation.findNavController(view).navigate(R.id.profileFragment);
-                    return true;
-                }
-                return false;
-            });
-        }
+        // ---> FIXED: REMOVED OLD MATERIAL VIEW CHECKS AND ACTIVATED CUSTOM NAVBAR SYSTEM <---
+        setupHealthWorkerNavigation(view, "home");
 
         // 3. Initialize Data Loaders
         fetchHealthWorkers();
@@ -214,26 +198,23 @@ public class HealthWorkerDashboardFragment extends Fragment {
     }
 
     private void fetchHealthWorkers() {
-        // FIXED: Point specifically to the "Users" node
-        mDatabase.child("Users").addValueEventListener(new ValueEventListener() {
+        // MATCHES YOUR FIREBASE TREE EXACTLY
+        mDatabase.child("HealthWorkers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (llWorkerList != null) llWorkerList.removeAllViews();
                 int count = 0;
 
                 for (DataSnapshot userSnap : snapshot.getChildren()) {
-                    String role = userSnap.child("role").getValue(String.class);
-                    if (role != null && role.equals("Health Worker")) {
-                        count++;
-                        String name = userSnap.child("fullName").getValue(String.class);
-                        String spec = userSnap.child("specialization").getValue(String.class);
-                        String phone = userSnap.child("phone").getValue(String.class);
-                        String email = userSnap.child("email").getValue(String.class);
-                        Long regDate = userSnap.child("registrationDate").getValue(Long.class);
-                        String uniqueId = userSnap.getKey();
+                    count++;
+                    String name = userSnap.child("fullName").getValue(String.class);
+                    String spec = userSnap.child("specialization").getValue(String.class);
+                    String phone = userSnap.child("phone").getValue(String.class);
+                    String email = userSnap.child("email").getValue(String.class);
+                    Long regDate = userSnap.child("registrationDate").getValue(Long.class);
+                    String uniqueId = userSnap.getKey();
 
-                        addWorkerCardToUI(name, spec, uniqueId, phone, email, regDate);
-                    }
+                    addWorkerCardToUI(name, spec, uniqueId, phone, email, regDate);
                 }
                 if (tvCount != null) tvCount.setText(count + " registered health workers");
             }
@@ -281,9 +262,8 @@ public class HealthWorkerDashboardFragment extends Fragment {
         String userKey = prefs.getString("loggedUserKey", "");
 
         if (!userKey.isEmpty()) {
-            // NOTE: Make sure your login screen saves health workers to "Users" or "HealthWorkers".
-            // If they are saved under "Users", change this path to .child("Users").child(userKey)
-            mDatabase.child("Users").child(userKey).addValueEventListener(new ValueEventListener() {
+            // MATCHES YOUR FIREBASE TREE EXACTLY
+            mDatabase.child("HealthWorkers").child(userKey).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists() && isAdded()) {
@@ -402,6 +382,79 @@ public class HealthWorkerDashboardFragment extends Fragment {
         if (tvCardBadge != null) {
             if (count > 0) { tvCardBadge.setVisibility(View.VISIBLE); tvCardBadge.setText(String.valueOf(count)); }
             else { tvCardBadge.setVisibility(View.GONE); }
+        }
+    }
+    // --- SHARED REUSABLE LAYOUT SELECTION NAVIGATION SYSTEM HANDLING METHOD ---
+    private void setupHealthWorkerNavigation(View view, String activeTab) {
+        View navBarContainer = view.findViewById(R.id.healthWorkerNavBar);
+        if (navBarContainer == null) return;
+
+        LinearLayout customNavHome = navBarContainer.findViewById(R.id.nav_home);
+        LinearLayout customNavConsultations = navBarContainer.findViewById(R.id.nav_consultations_tab);
+        LinearLayout customNavAddRecord = navBarContainer.findViewById(R.id.nav_add_record_tab);
+        LinearLayout customNavNotifications = navBarContainer.findViewById(R.id.nav_notifications_tab);
+        LinearLayout customNavProfile = navBarContainer.findViewById(R.id.nav_profile_tab);
+
+        if (activeTab.equals("home")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_home, R.id.tv_nav_home);
+        } else if (activeTab.equals("consultations")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_consultations, R.id.tv_nav_consultations);
+        } else if (activeTab.equals("add")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_add, R.id.tv_nav_add);
+        } else if (activeTab.equals("alerts")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_alerts, R.id.tv_nav_alerts);
+        } else if (activeTab.equals("profile")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_profile, R.id.tv_nav_profile);
+        }
+
+        if (customNavHome != null) {
+            customNavHome.setOnClickListener(v -> {
+                if (!activeTab.equals("home")) {
+                    Navigation.findNavController(view).navigate(R.id.healthWorkerDashboardFragment);
+                }
+            });
+        }
+
+        if (customNavConsultations != null) {
+            customNavConsultations.setOnClickListener(v -> {
+                if (!activeTab.equals("consultations")) {
+                    Navigation.findNavController(view).navigate(R.id.consultationsFragment);
+                }
+            });
+        }
+
+        if (customNavAddRecord != null) {
+            customNavAddRecord.setOnClickListener(v -> {
+                if (!activeTab.equals("add")) {
+                    Navigation.findNavController(view).navigate(R.id.addConsultationFragment);
+                }
+            });
+        }
+
+        if (customNavNotifications != null) {
+            customNavNotifications.setOnClickListener(v -> {
+                if (!activeTab.equals("alerts")) {
+                    Navigation.findNavController(view).navigate(R.id.alertsFragment);
+                }
+            });
+        }
+
+        if (customNavProfile != null) {
+            customNavProfile.setOnClickListener(v -> {
+                if (!activeTab.equals("profile")) {
+                    Navigation.findNavController(view).navigate(R.id.profileFragment);
+                }
+            });
+        }
+    }
+
+    private void highlightActiveTab(View parentView, int iconResId, int textResId) {
+        ImageView icon = parentView.findViewById(iconResId);
+        TextView text = parentView.findViewById(textResId);
+        if (icon != null) icon.setColorFilter(Color.parseColor("#2D79D1"));
+        if (text != null) {
+            text.setTextColor(Color.parseColor("#2D79D1"));
+            text.setTypeface(null, android.graphics.Typeface.BOLD);
         }
     }
 }

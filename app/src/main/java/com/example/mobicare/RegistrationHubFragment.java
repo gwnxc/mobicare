@@ -105,28 +105,6 @@ public class RegistrationHubFragment extends Fragment {
         // 5. ATTACH ALL LISTENERS
         attachListeners();
 
-        // ---> FIXED: BOTTOM NAVIGATION MOVED HERE <---
-        BottomNavigationView bottomNav = view.findViewById(R.id.bottomNavHealthWorker);
-        if (bottomNav != null) {
-            bottomNav.setOnItemSelectedListener(item -> {
-                int id = item.getItemId();
-
-                if (id == R.id.healthWorkerDashboardFragment) {
-                    Navigation.findNavController(view).navigate(R.id.healthWorkerDashboardFragment);
-                    return true;
-                }
-                else if (id == R.id.addConsultationFragment) {
-                    Navigation.findNavController(view).navigate(R.id.addConsultationFragment);
-                    return true;
-                }
-                else if (id == R.id.profileFragment) {
-                    Navigation.findNavController(view).navigate(R.id.profileFragment);
-                    return true;
-                }
-
-                return false;
-            });
-        }
 
         // 6. STARTUP STATE
         cardGuardian.performClick();

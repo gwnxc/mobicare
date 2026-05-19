@@ -25,6 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
 public class healthRecordsFragment extends Fragment {
 
     private String childId;
@@ -94,7 +97,7 @@ public class healthRecordsFragment extends Fragment {
             if (cvViewOnlyWarning != null) cvViewOnlyWarning.setVisibility(View.GONE);
             if (cvScheduleNotice != null) cvScheduleNotice.setVisibility(View.GONE);
             if (btnEditRecord != null) {
-                btnEditRecord.setVisibility(View.VISIBLE);
+                btnEditRecord.setVisibility(View.GONE);
                 btnEditRecord.setOnClickListener(v -> Toast.makeText(getContext(), "Opening Edit Form for " + (childName != null ? childName : "Patient"), Toast.LENGTH_SHORT).show());
             }
         }
@@ -148,50 +151,49 @@ public class healthRecordsFragment extends Fragment {
 
     private void fetchFullImmunizationHistory() {
         immunizationsRef = FirebaseDatabase.getInstance().getReference("Immunizations");
+        String[] requiredVaccines = {"BCG Vaccine", "Hepatitis B Vaccine", "Pentavalent Vaccine", "OPV", "IPV", "PCV", "MMR"};
 
-        // FIX: Changed to addValueEventListener for real-time history list adjustments
-        vaxListener = immunizationsRef.orderByChild("childId").equalTo(childId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!isAdded() || llFullVaccineHistory == null) return;
-                llFullVaccineHistory.removeAllViews();
+        vaxListener = immunizationsRef.orderByChild("childName").equalTo(childName)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!isAdded() || llFullVaccineHistory == null) return;
+                        llFullVaccineHistory.removeAllViews();
 
-                int completedCount = 0;
-                int targetVaccines = 5; // Formatted to match your 5-vax prototype setup scale
+                        List<String> receivedList = new ArrayList<>();
 
-                for (DataSnapshot vaxSnap : snapshot.getChildren()) {
-                    completedCount++;
-                    String vaxType = vaxSnap.child("vaccineType").getValue(String.class);
-                    String dose = vaxSnap.child("doseNo").getValue(String.class);
-                    String dateAdministered = vaxSnap.child("dateAdministered").getValue(String.class);
-                    String nextSchedule = vaxSnap.child("nextSchedule").getValue(String.class);
+                        for (DataSnapshot vaxSnap : snapshot.getChildren()) {
+                            String vaxType = vaxSnap.child("vaccineType").getValue(String.class);
+                            String dose = vaxSnap.child("doseNo").getValue(String.class);
 
-                    // Dynamic name resolving fallback
-                    if (childName == null && vaxSnap.hasChild("childName")) {
-                        childName = vaxSnap.child("childName").getValue(String.class);
-                        if (tvChildSubtitle != null) tvChildSubtitle.setText(childName);
+                            // Make sure you define the variable exactly as you use it below
+                            String dateAdministered = vaxSnap.child("dateAdministered").getValue(String.class);
+                            String nextSchedule = vaxSnap.child("nextSchedule").getValue(String.class);
+
+                            if (vaxType != null && !receivedList.contains(vaxType)) {
+                                receivedList.add(vaxType);
+                            }
+
+                            String title = vaxType + (dose != null ? " (Dose " + dose + ")" : "");
+
+                            // Now this matches the variable name 'dateAdministered' defined 4 lines above!
+                            addHistoryCardToUI(title, dateAdministered, nextSchedule);
+                        }
+
+                        // Calculate Progress using a standard loop
+                        int totalRequired = requiredVaccines.length;
+                        int completedCount = receivedList.size();
+                        int progressPercent = (int) (((float) completedCount / totalRequired) * 100);
+
+                        if (tvProgressText != null) tvProgressText.setText(completedCount + " of " + totalRequired + " types completed");
+                        if (tvPercent != null) tvPercent.setText(progressPercent + "%");
+                        if (pbVaccine != null) {
+                            pbVaccine.setMax(100);
+                            pbVaccine.setProgress(progressPercent);
+                        }
                     }
-
-                    String title = vaxType;
-                    if (dose != null && !dose.isEmpty()) {
-                        title += " (Dose " + dose + ")";
-                    }
-                    addHistoryCardToUI(title, dateAdministered, nextSchedule);
-                }
-
-                // UI Progress Meter calculations updates
-                if (tvProgressText != null) tvProgressText.setText(completedCount + " of " + targetVaccines + " completed");
-                if (pbVaccine != null) {
-                    pbVaccine.setMax(targetVaccines);
-                    pbVaccine.setProgress(completedCount);
-                }
-                if (tvPercent != null) {
-                    int percent = targetVaccines > 0 ? (int) (((float) completedCount / targetVaccines) * 100) : 0;
-                    tvPercent.setText(percent + "%");
-                }
-            }
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
-        });
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 
     private void fetchMedicineHistory() {
@@ -301,18 +303,32 @@ public class healthRecordsFragment extends Fragment {
         llMedicineHistory.addView(card);
     }
 
-    private void addHistoryCardToUI(String title, String givenDate, String nextDate) {
+    private void addHistoryCardToUI(String title, String givenDate, String nextSchedule) {
         if (llFullVaccineHistory == null || getContext() == null) return;
 
         View card = getLayoutInflater().inflate(R.layout.item_vaccine_history, null);
+
+        // Bind your existing views
         TextView tvName = card.findViewById(R.id.tvHistVaccineName);
         TextView tvGiven = card.findViewById(R.id.tvHistGivenDate);
+
+        // --- BINDING THE NEXT DOSE FIELDS ---
         LinearLayout llNextDose = card.findViewById(R.id.llNextDose);
+        TextView tvNextDate = card.findViewById(R.id.tvHistNextDate);
 
         if (tvName != null) tvName.setText(title != null ? title : "Unknown Vaccine");
         if (tvGiven != null) tvGiven.setText(givenDate != null ? "Given: " + givenDate : "Given: N/A");
 
-        if (llNextDose != null) llNextDose.setVisibility(View.GONE);
+        // Logic to show or hide the next dose section
+        if (llNextDose != null && tvNextDate != null) {
+            if (nextSchedule != null && !nextSchedule.isEmpty() && !nextSchedule.equals("Series Completed")) {
+                llNextDose.setVisibility(View.VISIBLE);
+                tvNextDate.setText("Next dose: " + nextSchedule);
+            } else {
+                llNextDose.setVisibility(View.GONE); // Hide the whole row if no date
+            }
+        }
+
         llFullVaccineHistory.addView(card);
     }
 

@@ -19,7 +19,7 @@
             android:layout_height="48dp"
             android:background="@drawable/circle_light_blue"
             android:padding="12dp"
-            android:src="@android:drawable/ic_popup_reminder"
+            android:src="@drawable/ic_notifications"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/trust_blue" />

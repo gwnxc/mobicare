@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="24dp"
     android:clickable="true"
     android:focusable="true"
     app:cardBackgroundColor="@android:color/white"
@@ -22,7 +22,7 @@
             android:layout_height="48dp"
             android:background="@drawable/badge_green_light"
             android:padding="10dp"
-            android:src="@android:drawable/ic_menu_myplaces"
+            android:src="@drawable/ic_child"
             app:tint="#388E3C" />
 
         <LinearLayout
@@ -63,7 +63,7 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@android:drawable/ic_media_next"
+            android:src="@drawable/ic_arrow_forward"
             app:tint="#CBD5E1" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

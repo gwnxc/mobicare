@@ -1,10 +1,12 @@
 package com.example.mobicare;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -76,33 +78,12 @@ public class ProfileFragment extends Fragment {
             btnLogoutContainer.setOnClickListener(v -> showLogoutConfirmation());
         }
 
-        // ---> ADDED: Bottom Navigation Listener <---
-        BottomNavigationView bottomNav = view.findViewById(R.id.bottomNavHealthWorker);
-        if (bottomNav != null) {
-            bottomNav.setOnItemSelectedListener(item -> {
-                int id = item.getItemId();
-
-                if (id == R.id.healthWorkerDashboardFragment) {
-                    Navigation.findNavController(view).navigate(R.id.healthWorkerDashboardFragment);
-                    return true;
-                }
-                else if (id == R.id.addConsultationFragment) {
-                    Navigation.findNavController(view).navigate(R.id.addConsultationFragment);
-                    return true;
-                }
-                else if (id == R.id.profileFragment) {
-                    // Already on Profile, do nothing
-                    return true;
-                }
-
-                return false;
-            });
-        }
-
         // 6. Load Data
         loadProfileData();
-    }
 
+        // ---> FIXED: INITIALIZE NAVIGATION SYSTEM & HIGHGLIGHT PROFILE TAB INDICATOR BLUE RIGHT HERE <---
+        setupHealthWorkerNavigation(view, "profile");
+    }
     private void setupInfoRows(View view) {
         rowUser = view.findViewById(R.id.layoutUsername);
         rowPhone = view.findViewById(R.id.layoutPhone);
@@ -198,5 +179,61 @@ public class ProfileFragment extends Fragment {
         });
 
         dialog.show();
+    }
+    private void setupHealthWorkerNavigation(View view, String activeTab) {
+        View navBarContainer = view.findViewById(R.id.healthWorkerNavBar);
+        if (navBarContainer == null) return;
+
+        LinearLayout customNavHome = navBarContainer.findViewById(R.id.nav_home);
+        LinearLayout customNavConsultations = navBarContainer.findViewById(R.id.nav_consultations_tab);
+        LinearLayout customNavAddRecord = navBarContainer.findViewById(R.id.nav_add_record_tab);
+        LinearLayout customNavNotifications = navBarContainer.findViewById(R.id.nav_notifications_tab);
+        LinearLayout customNavProfile = navBarContainer.findViewById(R.id.nav_profile_tab);
+
+        if (activeTab.equals("home")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_home, R.id.tv_nav_home);
+        } else if (activeTab.equals("consultations")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_consultations, R.id.tv_nav_consultations);
+        } else if (activeTab.equals("add")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_add, R.id.tv_nav_add);
+        } else if (activeTab.equals("alerts")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_alerts, R.id.tv_nav_alerts);
+        } else if (activeTab.equals("profile")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_profile, R.id.tv_nav_profile);
+        }
+
+        if (customNavHome != null) {
+            customNavHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.healthWorkerDashboardFragment));
+        }
+
+        if (customNavConsultations != null) {
+            customNavConsultations.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.consultationsFragment));
+        }
+
+        if (customNavAddRecord != null) {
+            customNavAddRecord.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.addConsultationFragment));
+        }
+
+        if (customNavNotifications != null) {
+            customNavNotifications.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.alertsFragment));
+        }
+
+        if (customNavProfile != null) {
+            customNavProfile.setOnClickListener(v -> {
+                if (!activeTab.equals("profile")) {
+                    Navigation.findNavController(view).navigate(R.id.profileFragment);
+                }
+            });
+        }
+    }
+
+    private void highlightActiveTab(View parentView, int iconResId, int textResId) {
+        ImageView icon = parentView.findViewById(iconResId);
+        TextView text = parentView.findViewById(textResId);
+        if (icon != null) icon.setColorFilter(Color.parseColor("#2D79D1"));
+        if (text != null) {
+            text.setTextColor(Color.parseColor("#2D79D1"));
+            text.setTypeface(null, android.graphics.Typeface.BOLD);
+        }
     }
 }

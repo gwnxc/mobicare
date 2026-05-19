@@ -19,7 +19,7 @@
             android:id="@+id/ivStatIcon"
             android:layout_width="22dp"
             android:layout_height="22dp"
-            android:src="@android:drawable/ic_menu_myplaces"
+            android:src="@drawable/ic_guardian"
             app:tint="@color/pure_white" />
 
         <TextView

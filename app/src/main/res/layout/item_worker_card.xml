@@ -22,7 +22,7 @@
             android:layout_height="48dp"
             android:background="@drawable/circle_light_blue"
             android:padding="12dp"
-            android:src="@android:drawable/ic_secure"
+            android:src="@drawable/ic_healthworker"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/trust_blue" />

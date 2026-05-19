@@ -84,29 +84,34 @@ public class childProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
+                    // Fetching from Firebase keys
                     String fName = snapshot.child("firstName").getValue(String.class);
+                    String mName = snapshot.child("middleName").getValue(String.class);
                     String lName = snapshot.child("lastName").getValue(String.class);
-                    String fullName = (fName != null ? fName : "") + " " + (lName != null ? lName : "");
+
+                    // Concatenating names correctly
+                    String fullName = (fName != null ? fName : "") + " " +
+                            (mName != null ? mName + " " : "") +
+                            (lName != null ? lName : "");
 
                     String gender = snapshot.child("gender").getValue(String.class);
                     String birth = snapshot.child("birthDate").getValue(String.class);
+                    String bPlace = snapshot.child("placeOfBirth").getValue(String.class);
 
-                    // Data is not present in the database, setting placeholders
-                    String weight = "--";
-                    String height = "--";
-
+                    // Binding to views
                     TextView tvName = view.findViewById(R.id.tvProfileName);
                     TextView tvBasic = view.findViewById(R.id.tvProfileBasic);
                     TextView tvBirth = view.findViewById(R.id.tvProfileBirth);
-                    TextView tvWeight = view.findViewById(R.id.tvProfileWeight);
-                    TextView tvHeight = view.findViewById(R.id.tvProfileHeight);
+                    TextView tvBirthPlace = view.findViewById(R.id.tvProfileBirthPlace);
 
                     if (tvName != null) tvName.setText(fullName.trim());
                     if (tvBasic != null) tvBasic.setText(calculateAge(birth) + " • " + (gender != null ? gender : "N/A"));
                     if (tvBirth != null) tvBirth.setText(birth != null ? birth : "--");
 
-                    if (tvWeight != null) tvWeight.setText(weight + " kg");
-                    if (tvHeight != null) tvHeight.setText(height + " cm");
+                    // Bind the new Place of Birth field
+                    if (tvBirthPlace != null) {
+                        tvBirthPlace.setText("Place of Birth: " + (bPlace != null ? bPlace : "Not specified"));
+                    }
                 }
             }
             @Override public void onCancelled(@NonNull DatabaseError error) {}

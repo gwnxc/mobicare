@@ -12,7 +12,7 @@
         android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavHealthWorker">
+        app:layout_constraintBottom_toTopOf="@+id/healthWorkerNavBar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -302,14 +302,11 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavHealthWorker"
+    <include
+        android:id="@+id/healthWorkerNavBar"
+        layout="@layout/layout_bottom_nav_health_worker"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        app:itemIconTint="@color/slate_navy"
-        app:itemTextColor="@color/slate_navy"
-        app:menu="@menu/bottom_nav_menu"
+        android:layout_height="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

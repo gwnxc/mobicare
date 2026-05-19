@@ -37,6 +37,20 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tvStatusBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:text="STATUS"
+            app:layout_constraintStart_toEndOf="@+id/tvPatientType"
+            app:layout_constraintTop_toTopOf="@+id/tvPatientName"
+            app:layout_constraintBottom_toBottomOf="@+id/tvPatientName" />
+
+        <TextView
             android:id="@+id/tvPatientType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -67,8 +81,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="📅 13/4/2026 at 09:00 AM"
-            android:textColor="@color/cool_grey"
+            android:text="13/4/2026 at 09:00 AM"
+            android:textColor="@color/slate_navy"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@+id/tvPatientName"
             app:layout_constraintTop_toBottomOf="@+id/tvPurpose" />
@@ -79,7 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Assigned to: Emma"
-            android:textColor="@color/cool_grey"
+            android:textColor="@color/slate_navy"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@+id/tvPatientName"
             app:layout_constraintTop_toBottomOf="@+id/tvDateTime" />

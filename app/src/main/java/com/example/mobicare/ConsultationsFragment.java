@@ -2,10 +2,12 @@ package com.example.mobicare;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -63,6 +65,8 @@ public class ConsultationsFragment extends Fragment {
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Consultations");
         fetchConsultations();
+
+        setupHealthWorkerNavigation(view, "consultations");
     }
 
     private void fetchConsultations() {
@@ -104,15 +108,38 @@ public class ConsultationsFragment extends Fragment {
     }
 
     private void addConsultationCardToUI(LinearLayout container, Consultation consultation) {
-        // This manually inflates the items since we aren't using a RecyclerView anymore
         View card = getLayoutInflater().inflate(R.layout.item_consultation_card, container, false);
 
-        // Find views inside your item_consultation_card.xml
+        // Bind existing fields
         TextView tvName = card.findViewById(R.id.tvPatientName);
-        TextView tvDate = card.findViewById(R.id.tvDateTime);
+        TextView tvType = card.findViewById(R.id.tvPatientType);
+        TextView tvPurpose = card.findViewById(R.id.tvPurpose);
+        TextView tvDateTime = card.findViewById(R.id.tvDateTime);
+        TextView tvWorker = card.findViewById(R.id.tvWorker);
 
+        // Bind the new Status Badge
+        TextView tvStatusBadge = card.findViewById(R.id.tvStatusBadge);
+
+        // Set Text
         if (tvName != null) tvName.setText(consultation.patientName);
-        if (tvDate != null) tvDate.setText(consultation.date);
+        if (tvType != null) tvType.setText(consultation.patientType);
+        if (tvPurpose != null) tvPurpose.setText("Purpose: " + consultation.reason);
+        if (tvDateTime != null) tvDateTime.setText(consultation.date + " at " + consultation.time);
+        if (tvWorker != null) tvWorker.setText("Assigned to: " + consultation.healthWorker);
+
+        // Set Status Badge Logic
+        if (tvStatusBadge != null) {
+            tvStatusBadge.setText(consultation.status != null ? consultation.status.toUpperCase() : "PENDING");
+
+            // Color coding
+            if ("completed".equalsIgnoreCase(consultation.status)) {
+                tvStatusBadge.setTextColor(Color.parseColor("#388E3C")); // Green
+            } else if ("cancelled".equalsIgnoreCase(consultation.status)) {
+                tvStatusBadge.setTextColor(Color.parseColor("#D32F2F")); // Red
+            } else {
+                tvStatusBadge.setTextColor(Color.parseColor("#1976D2")); // Blue
+            }
+        }
 
         card.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
@@ -122,5 +149,81 @@ public class ConsultationsFragment extends Fragment {
         });
 
         container.addView(card);
+    }
+    private void setupHealthWorkerNavigation(View view, String activeTab) {
+        // 1. Find the master navigation container element first
+        View navBarContainer = view.findViewById(R.id.healthWorkerNavBar);
+        if (navBarContainer == null) return; // Prevent null pointer crashes
+
+        // 2. Query elements INSIDE the parent container scope to resolve the symbol paths
+        LinearLayout customNavHome = navBarContainer.findViewById(R.id.nav_home);
+        LinearLayout customNavConsultations = navBarContainer.findViewById(R.id.nav_consultations_tab);
+        LinearLayout customNavAddRecord = navBarContainer.findViewById(R.id.nav_add_record_tab);
+        LinearLayout customNavNotifications = navBarContainer.findViewById(R.id.nav_notifications_tab);
+        LinearLayout customNavProfile = navBarContainer.findViewById(R.id.nav_profile_tab);
+
+        // 3. Apply active color adjustments directly to the layout reference scope
+        if (activeTab.equals("home")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_home, R.id.tv_nav_home);
+        } else if (activeTab.equals("consultations")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_consultations, R.id.tv_nav_consultations);
+        } else if (activeTab.equals("add")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_add, R.id.tv_nav_add);
+        } else if (activeTab.equals("alerts")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_alerts, R.id.tv_nav_alerts);
+        } else if (activeTab.equals("profile")) {
+            highlightActiveTab(navBarContainer, R.id.iv_nav_profile, R.id.tv_nav_profile);
+        }
+
+        // 4. Click routing rules using exact nav_graph destination targets
+        if (customNavHome != null) {
+            customNavHome.setOnClickListener(v -> {
+                if (!activeTab.equals("home")) {
+                    Navigation.findNavController(view).navigate(R.id.healthWorkerDashboardFragment);
+                }
+            });
+        }
+
+        if (customNavConsultations != null) {
+            customNavConsultations.setOnClickListener(v -> {
+                if (!activeTab.equals("consultations")) {
+                    Navigation.findNavController(view).navigate(R.id.consultationsFragment);
+                }
+            });
+        }
+
+        if (customNavAddRecord != null) {
+            customNavAddRecord.setOnClickListener(v -> {
+                if (!activeTab.equals("add")) {
+                    Navigation.findNavController(view).navigate(R.id.addConsultationFragment);
+                }
+            });
+        }
+
+        if (customNavNotifications != null) {
+            customNavNotifications.setOnClickListener(v -> {
+                if (!activeTab.equals("alerts")) {
+                    Navigation.findNavController(view).navigate(R.id.alertsFragment);
+                }
+            });
+        }
+
+        if (customNavProfile != null) {
+            customNavProfile.setOnClickListener(v -> {
+                if (!activeTab.equals("profile")) {
+                    Navigation.findNavController(view).navigate(R.id.profileFragment);
+                }
+            });
+        }
+    }
+
+    private void highlightActiveTab(View parentView, int iconResId, int textResId) {
+        ImageView icon = parentView.findViewById(iconResId);
+        TextView text = parentView.findViewById(textResId);
+        if (icon != null) icon.setColorFilter(Color.parseColor("#2D79D1")); // Colors it active blue
+        if (text != null) {
+            text.setTextColor(Color.parseColor("#2D79D1"));
+            text.setTypeface(null, android.graphics.Typeface.BOLD); // Bolds the active screen label
+        }
     }
 }

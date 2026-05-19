@@ -19,7 +19,7 @@
             android:layout_height="48dp"
             android:background="@drawable/badge_green_light"
             android:padding="10dp"
-            android:src="@android:drawable/ic_menu_myplaces"
+            android:src="@drawable/ic_user"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="#4CAF50" />
