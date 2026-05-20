@@ -383,6 +383,7 @@ public class AddConsultationFragment extends Fragment {
         consultRef.setValue(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(getContext(), "Consultation Saved!", Toast.LENGTH_SHORT).show();
+
                 Navigation.findNavController(requireView()).navigateUp();
             }
         });

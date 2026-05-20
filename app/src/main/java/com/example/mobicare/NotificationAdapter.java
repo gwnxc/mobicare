@@ -50,11 +50,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         // 3. Mark as Read on Click
         holder.itemView.setOnClickListener(v -> {
-            // Safe check for ID and Read status
-            if (!isRead && n.id != null) {
+            if (!Boolean.TRUE.equals(n.isRead) && n.id != null) {
+                // Update Firebase
                 FirebaseDatabase.getInstance().getReference("Notifications")
                         .child(n.id)
                         .child("isRead").setValue(true);
+
+                // Update local object
+                n.isRead = true;
+
+                // Refresh only this specific row
+                notifyItemChanged(position);
             }
         });
     }

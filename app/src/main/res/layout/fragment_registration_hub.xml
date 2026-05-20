@@ -105,32 +105,19 @@
         android:fillViewport="true"
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@+id/selectorContainer"
-        app:layout_constraintBottom_toTopOf="@+id/healthWorkerNavBar">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp">
-            <include
-                android:id="@+id/includeGuardianForm"
-                layout="@layout/fragment_register_mother" />
-
-            <include
-                android:id="@+id/includeChildForm"
-                layout="@layout/fragment_register_child"
-                android:visibility="gone" />
-
-        </FrameLayout>
-    </androidx.core.widget.NestedScrollView>
-
-    <include
-        android:id="@+id/healthWorkerNavBar"
-        layout="@layout/layout_bottom_nav_health_worker"
+        app:layout_constraintBottom_toBottomOf="parent"> <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_height="wrap_content"
+        android:paddingBottom="100dp"> <include
+        android:id="@+id/includeGuardianForm"
+        layout="@layout/fragment_register_mother" />
+
+        <include
+            android:id="@+id/includeChildForm"
+            layout="@layout/fragment_register_child"
+            android:visibility="gone" />
+    </FrameLayout>
+    </androidx.core.widget.NestedScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
