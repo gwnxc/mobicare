@@ -21,7 +21,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -62,7 +61,8 @@ public class HealthWorkerDashboardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
+        // FIXED: Lowercase 'c' to match your LoginFragment
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", android.content.Context.MODE_PRIVATE);
         currentUid = prefs.getString("loggedUserKey", "");
 
         // 1. Initialize Views
@@ -117,7 +117,7 @@ public class HealthWorkerDashboardFragment extends Fragment {
             btnAddWorker.setOnClickListener(v -> showAddWorkerDialog());
         }
 
-        // ---> FIXED: REMOVED OLD MATERIAL VIEW CHECKS AND ACTIVATED CUSTOM NAVBAR SYSTEM <---
+        // ---> ACTIVATED CUSTOM NAVBAR SYSTEM <---
         setupHealthWorkerNavigation(view, "home");
 
         // 3. Initialize Data Loaders
@@ -175,7 +175,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
                 map.put("role", "Health Worker");
                 map.put("registrationDate", System.currentTimeMillis());
 
-                // FIXED: Explicitly push under the "Users" directory node
                 String uniqueId = mDatabase.child("Users").push().getKey();
                 if (uniqueId != null) {
                     mDatabase.child("Users").child(uniqueId).setValue(map).addOnCompleteListener(task -> {
@@ -198,7 +197,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
     }
 
     private void fetchHealthWorkers() {
-        // MATCHES YOUR FIREBASE TREE EXACTLY
         mDatabase.child("HealthWorkers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -249,7 +247,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
 
         card.findViewById(R.id.btnEdit).setOnClickListener(v -> Toast.makeText(getContext(), "Edit feature coming soon for " + name, Toast.LENGTH_SHORT).show());
         card.findViewById(R.id.btnDelete).setOnClickListener(v -> {
-            // FIXED: Explicitly delete from the "Users" path node
             mDatabase.child("Users").child(uniqueId).removeValue();
             Toast.makeText(getContext(), "Deleted " + name, Toast.LENGTH_SHORT).show();
         });
@@ -258,11 +255,11 @@ public class HealthWorkerDashboardFragment extends Fragment {
     }
 
     private void fetchHealthWorkerProfile() {
-        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
+        // FIXED: Lowercase 'c' to match your LoginFragment
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", android.content.Context.MODE_PRIVATE);
         String userKey = prefs.getString("loggedUserKey", "");
 
         if (!userKey.isEmpty()) {
-            // MATCHES YOUR FIREBASE TREE EXACTLY
             mDatabase.child("HealthWorkers").child(userKey).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -279,7 +276,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
         }
     }
 
-    // ... (The rest of your activity/stat/notification logic remains the same)
     private void listenForRecentActivities() {
         com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
         String uid = (user != null) ? user.getUid() : (currentUid != null ? currentUid : "");
@@ -327,21 +323,6 @@ public class HealthWorkerDashboardFragment extends Fragment {
         }
     }
 
-    private void showLogoutConfirmation() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_logout, null);
-        builder.setView(dialogView);
-        AlertDialog dialog = builder.create();
-        if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialogView.findViewById(R.id.btnCancelLogout).setOnClickListener(v -> dialog.dismiss());
-        dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
-            dialog.dismiss(); FirebaseAuth.getInstance().signOut();
-            Navigation.findNavController(requireView()).navigate(R.id.loginFragment);
-            Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
-        });
-        dialog.show();
-    }
-
     private void fetchDashboardStats() {
         mDatabase.child("Patients_Guardians").addValueEventListener(new ValueEventListener() {
             @Override public void onDataChange(@NonNull DataSnapshot snapshot) { if (isAdded() && tvMotherCount != null) tvMotherCount.setText(String.valueOf(snapshot.getChildrenCount())); }
@@ -384,6 +365,7 @@ public class HealthWorkerDashboardFragment extends Fragment {
             else { tvCardBadge.setVisibility(View.GONE); }
         }
     }
+
     // --- SHARED REUSABLE LAYOUT SELECTION NAVIGATION SYSTEM HANDLING METHOD ---
     private void setupHealthWorkerNavigation(View view, String activeTab) {
         View navBarContainer = view.findViewById(R.id.healthWorkerNavBar);
@@ -456,5 +438,31 @@ public class HealthWorkerDashboardFragment extends Fragment {
             text.setTextColor(Color.parseColor("#2D79D1"));
             text.setTypeface(null, android.graphics.Typeface.BOLD);
         }
+    }
+
+    private void showLogoutConfirmation() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_logout, null);
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+
+        if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        dialogView.findViewById(R.id.btnCancelLogout).setOnClickListener(v -> dialog.dismiss());
+        dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
+            dialog.dismiss();
+
+            // 1. Sign out of Firebase
+            FirebaseAuth.getInstance().signOut();
+
+            // 2. CRITICAL: Clear the SharedPreferences using the exact lowercase 'c'
+            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", android.content.Context.MODE_PRIVATE);
+            prefs.edit().clear().apply();
+
+            // 3. Navigate back to Login
+            Navigation.findNavController(requireView()).navigate(R.id.loginFragment);
+            Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
+        });
+        dialog.show();
     }
 }

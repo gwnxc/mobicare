@@ -89,13 +89,9 @@ public class patientProfileFragment extends Fragment {
             btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
         }
 
+        // ---> THE FIX: Changed to trigger the confirmation popup! <---
         if (btnLogout != null) {
-            btnLogout.setOnClickListener(v -> {
-                FirebaseAuth.getInstance().signOut();
-                requireActivity().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE).edit().clear().apply();
-                requireActivity().getSharedPreferences("MobiCarePrefs", Context.MODE_PRIVATE).edit().clear().apply();
-                Navigation.findNavController(view).navigate(R.id.loginFragment);
-            });
+            btnLogout.setOnClickListener(v -> showLogoutConfirmation());
         }
 
         // --- Bottom Navigation Setup ---
@@ -285,6 +281,39 @@ public class patientProfileFragment extends Fragment {
                 }
             });
         }
+        dialog.show();
+    }
+
+    private void showLogoutConfirmation() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_logout, null);
+        builder.setView(dialogView);
+        android.app.AlertDialog dialog = builder.create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        dialogView.findViewById(R.id.btnCancelLogout).setOnClickListener(v -> dialog.dismiss());
+
+        dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
+            dialog.dismiss();
+
+            // 1. Sign out of Firebase (Important for Mothers who use Firebase Auth)
+            com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+
+            // 2. CRITICAL: Clear both potential SharedPreferences names just to be extremely safe
+            android.content.SharedPreferences prefs1 = requireContext().getSharedPreferences("MobicarePrefs", android.content.Context.MODE_PRIVATE);
+            prefs1.edit().clear().apply();
+
+            android.content.SharedPreferences prefs2 = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
+            prefs2.edit().clear().apply();
+
+            // 3. Navigate back to Login
+            androidx.navigation.Navigation.findNavController(requireView()).navigate(R.id.loginFragment);
+            android.widget.Toast.makeText(getContext(), "Logged out successfully", android.widget.Toast.LENGTH_SHORT).show();
+        });
+
         dialog.show();
     }
 }

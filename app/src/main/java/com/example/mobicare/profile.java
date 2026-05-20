@@ -81,7 +81,6 @@ public class profile extends Fragment {
         tvAdminPhone = view.findViewById(R.id.tvAdminPhone);
         tvAdminAddress = view.findViewById(R.id.tvAdminAddress);
 
-        // ---> THE FIX: btnLogout is now correctly identified as an ImageView! <---
         MaterialCardView btnEditProfile = view.findViewById(R.id.btnEditProfile);
         MaterialCardView btnChangePassword = view.findViewById(R.id.btnChangePassword);
         ImageView btnLogout = view.findViewById(R.id.btnLogout);
@@ -95,16 +94,9 @@ public class profile extends Fragment {
         if (btnEditProfile != null) btnEditProfile.setOnClickListener(v -> showEditProfileDialog());
         if (btnChangePassword != null) btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
 
-        // Logout Logic
+        // ---> FIXED: Now this actually calls your popup method! <---
         if (btnLogout != null) {
-            btnLogout.setOnClickListener(v -> {
-                // Clear the sticky note so they don't stay logged in!
-                prefs.edit().clear().apply();
-
-                Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
-                NavOptions navOptions = new NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build();
-                Navigation.findNavController(view).navigate(R.id.loginFragment, null, navOptions);
-            });
+            btnLogout.setOnClickListener(v -> showLogoutConfirmation());
         }
     }
 
@@ -261,5 +253,35 @@ public class profile extends Fragment {
             ((TextView) navProfile.getChildAt(1)).setTextColor(activeColor);
             navProfile.setOnClickListener(v -> {}); // Already on Profile
         }
+    }
+
+    private void showLogoutConfirmation() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_logout, null);
+        builder.setView(dialogView);
+        android.app.AlertDialog dialog = builder.create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        dialogView.findViewById(R.id.btnCancelLogout).setOnClickListener(v -> dialog.dismiss());
+
+        dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
+            dialog.dismiss();
+
+            // 1. Sign out of Firebase (Important for Mothers who use Firebase Auth)
+            com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+
+            // 2. CRITICAL: Clear the SharedPreferences using the exact lowercase 'c'
+            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", android.content.Context.MODE_PRIVATE);
+            prefs.edit().clear().apply();
+
+            // 3. Navigate back to Login
+            androidx.navigation.Navigation.findNavController(requireView()).navigate(R.id.loginFragment);
+            android.widget.Toast.makeText(getContext(), "Logged out successfully", android.widget.Toast.LENGTH_SHORT).show();
+        });
+
+        dialog.show();
     }
 }

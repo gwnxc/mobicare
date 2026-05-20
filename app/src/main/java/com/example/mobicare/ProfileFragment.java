@@ -46,7 +46,8 @@ public class ProfileFragment extends Fragment {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         } else {
-            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
+            // FIXED: Using lowercase 'c' to match login save state
+            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", android.content.Context.MODE_PRIVATE);
             userId = prefs.getString("loggedUserKey", "");
         }
         this.currentUid = userId;
@@ -84,6 +85,7 @@ public class ProfileFragment extends Fragment {
         // ---> FIXED: INITIALIZE NAVIGATION SYSTEM & HIGHGLIGHT PROFILE TAB INDICATOR BLUE RIGHT HERE <---
         setupHealthWorkerNavigation(view, "profile");
     }
+
     private void setupInfoRows(View view) {
         rowUser = view.findViewById(R.id.layoutUsername);
         rowPhone = view.findViewById(R.id.layoutPhone);
@@ -106,7 +108,8 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadProfileData() {
-        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
+        // FIXED: Using lowercase 'c' to match login save state
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", android.content.Context.MODE_PRIVATE);
         String userKey = prefs.getString("loggedUserKey", "");
 
         if (userKey.isEmpty()) return;
@@ -153,6 +156,7 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    // FIXED: The logout confirmation method is now safely inside the class
     private void showLogoutConfirmation() {
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(requireContext());
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_logout, null);
@@ -168,18 +172,21 @@ public class ProfileFragment extends Fragment {
         dialogView.findViewById(R.id.btnConfirmLogout).setOnClickListener(v -> {
             dialog.dismiss();
 
+            // 1. Sign out of Firebase
             FirebaseAuth.getInstance().signOut();
 
-            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
+            // 2. Clear the SharedPreferences using the exact lowercase 'c'
+            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", android.content.Context.MODE_PRIVATE);
             prefs.edit().clear().apply();
 
+            // 3. Navigate back to Login
             Navigation.findNavController(requireView()).navigate(R.id.loginFragment);
-
             Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
         });
 
         dialog.show();
     }
+
     private void setupHealthWorkerNavigation(View view, String activeTab) {
         View navBarContainer = view.findViewById(R.id.healthWorkerNavBar);
         if (navBarContainer == null) return;

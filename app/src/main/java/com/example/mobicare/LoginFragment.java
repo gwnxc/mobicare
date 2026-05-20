@@ -21,7 +21,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class LoginFragment extends Fragment {
@@ -40,6 +39,26 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // --- AUTO-LOGIN CHECK ---
+        SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE);
+        String currentUid = prefs.getString("loggedUserKey", "");
+        String userRole = prefs.getString("userRole", "");
+
+        com.google.firebase.auth.FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        // If either SharedPreferences or FirebaseAuth remembers the user, skip login
+        if (!currentUid.isEmpty() || currentUser != null) {
+            if ("Health Worker".equals(userRole)) {
+                Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_healthWorkerDashboardFragment);
+            } else if ("Patient".equals(userRole)) {
+                Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_patientDashboardFragment);
+            } else if ("Admin".equals(userRole)) {
+                Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_adminDashboardFragment);
+            }
+            return; // Stop the rest of the login screen from processing
+        }
+        // --- END AUTO-LOGIN CHECK ---
 
         // Initialize Firebase
         mAuth = FirebaseAuth.getInstance();
@@ -110,6 +129,7 @@ public class LoginFragment extends Fragment {
         }
         // ADMIN & HEALTH WORKERS: Use Realtime DB (Username login)
         else {
+            // FIXED: Matches your Firebase screenshot perfectly now ("HealthWorkers")
             String node = selectedRole.equals("Admin") ? "Admin" : "HealthWorkers";
 
             mDatabase.child(node).orderByChild("username").equalTo(identifier)
@@ -137,19 +157,17 @@ public class LoginFragment extends Fragment {
     }
 
     private void saveUserKeyAndNavigate(String role, String userKey, View view) {
-        // FIX 1: Change "MobiCarePrefs" to "MobicarePrefs" (lowercase 'c') to match patientDashboardFragment
         SharedPreferences prefs = requireActivity().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
-        // FIX 2: Store BOTH key names so both your Dashboard and your History layout sections can read the ID
-        editor.putString("loggedUserKey", userKey);  // Used by healthRecordsFragment & MyRecordFragment
-        editor.putString("loggedInUser", userKey);   // Used by patientDashboardFragment
+        editor.putString("loggedUserKey", userKey);
+        editor.putString("loggedInUser", userKey);
 
         // Map UI roles neatly into authorization strings
         if ("Mother".equals(role)) {
-            editor.putString("userRole", "Patient"); // Record fragments check for "Patient"
+            editor.putString("userRole", "Patient");
         } else {
-            editor.putString("userRole", role); // Saves exactly "Health Worker" or "Admin"
+            editor.putString("userRole", role);
         }
         editor.apply();
 

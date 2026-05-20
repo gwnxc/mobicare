@@ -36,8 +36,8 @@ public class patientAlertsFragment extends Fragment {
     private LinearLayout llNewNotifs, llEarlierNotifs;
     private TextView tvNewLabel, tvEarlierLabel, tvUnreadCountLabel, tvEmptyState;
 
-    private List<NotifEntry> unreadList = new ArrayList<>();
-    private List<NotifEntry> readList = new ArrayList<>();
+    private List<NotifEntry> upcomingList = new ArrayList<>();
+    private List<NotifEntry> pastList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -62,11 +62,16 @@ public class patientAlertsFragment extends Fragment {
         tvUnreadCountLabel = view.findViewById(R.id.tvUnreadCountLabel);
         tvEmptyState = view.findViewById(R.id.tvEmptyState);
 
+        // Update labels to fit the medical context
+        if (tvNewLabel != null) tvNewLabel.setText("Upcoming Appointments");
+        if (tvEarlierLabel != null) tvEarlierLabel.setText("Past Records");
+
         // --- Bottom Navigation Setup ---
         setupBottomNavigation(view);
 
         if (loggedInUserId != null) {
-            fetchNotifications();
+            // Now fetches from your actual records instead of the empty notifications folder
+            fetchMedicalRecords();
         }
     }
 
@@ -75,82 +80,78 @@ public class patientAlertsFragment extends Fragment {
         LinearLayout navAlerts = view.findViewById(R.id.nav_alerts);
         LinearLayout navProfile = view.findViewById(R.id.nav_profile);
 
-        // Define colors matching your XML
-        int activeColor = Color.parseColor("#155A91"); // trust_blue
-        int inactiveColor = Color.parseColor("#8E8E8E"); // cool_grey
+        int activeColor = Color.parseColor("#155A91");
+        int inactiveColor = Color.parseColor("#8E8E8E");
 
         if (navHome != null) {
-            // Set Home to inactive
             ((ImageView) navHome.getChildAt(0)).setColorFilter(inactiveColor);
             ((TextView) navHome.getChildAt(1)).setTextColor(inactiveColor);
-
-            navHome.setOnClickListener(v ->
-                    Navigation.findNavController(view).navigate(R.id.patientDashboardFragment)
-            );
+            navHome.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.patientDashboardFragment));
         }
 
         if (navAlerts != null) {
-            // Set Alerts to Active (Current Screen)
             View alertsIconContainer = navAlerts.getChildAt(0);
             if(alertsIconContainer instanceof android.widget.FrameLayout) {
                 View icon = ((android.widget.FrameLayout) alertsIconContainer).getChildAt(0);
-                if(icon instanceof ImageView) {
-                    ((ImageView) icon).setColorFilter(activeColor);
-                }
+                if(icon instanceof ImageView) ((ImageView) icon).setColorFilter(activeColor);
             } else if (alertsIconContainer instanceof ImageView) {
                 ((ImageView) alertsIconContainer).setColorFilter(activeColor);
             }
             ((TextView) navAlerts.getChildAt(1)).setTextColor(activeColor);
-
-            // Do nothing on click since we are already here
             navAlerts.setOnClickListener(v -> {});
         }
 
         if (navProfile != null) {
-            // Set Profile to inactive
             ((ImageView) navProfile.getChildAt(0)).setColorFilter(inactiveColor);
             ((TextView) navProfile.getChildAt(1)).setTextColor(inactiveColor);
-
-            navProfile.setOnClickListener(v ->
-                    Navigation.findNavController(view).navigate(R.id.patientProfileFragment)
-            );
+            navProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.patientProfileFragment));
         }
     }
 
-    private void fetchNotifications() {
-        DatabaseReference notifsRef = FirebaseDatabase.getInstance().getReference("Notifications");
+    private void fetchMedicalRecords() {
+        // Look directly at the Consultations database folder
+        DatabaseReference recordsRef = FirebaseDatabase.getInstance().getReference("Consultations");
 
-        // Fetch notifications where receiverUid matches the logged-in patient
-        notifsRef.orderByChild("receiverUid").equalTo(loggedInUserId).addValueEventListener(new ValueEventListener() {
+        recordsRef.orderByChild("patientUid").equalTo(loggedInUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!isAdded()) return; // Prevent crashes if fragment is detached
+                if (!isAdded()) return;
 
-                unreadList.clear();
-                readList.clear();
+                upcomingList.clear();
+                pastList.clear();
 
                 for (DataSnapshot snap : snapshot.getChildren()) {
-                    String title = snap.child("title").getValue(String.class);
-                    String message = snap.child("message").getValue(String.class);
-                    Long timestamp = snap.child("timestamp").getValue(Long.class);
-                    Boolean isRead = snap.child("isRead").getValue(Boolean.class);
                     String id = snap.getKey();
 
-                    if (timestamp == null) timestamp = 0L;
-                    if (isRead == null) isRead = false;
+                    // Pull the actual medical details
+                    String type = snap.child("type").getValue(String.class); // e.g., Vaccine, Checkup
+                    String date = snap.child("date").getValue(String.class);
+                    String status = snap.child("status").getValue(String.class);
+                    Long timestamp = snap.child("timestamp").getValue(Long.class);
 
-                    NotifEntry entry = new NotifEntry(id, title, message, timestamp, isRead);
+                    if (type == null) type = "Medical Record";
+                    if (date == null) date = "Date TBD";
+                    if (timestamp == null) timestamp = System.currentTimeMillis();
+                    if (status == null) status = "completed";
 
-                    if (isRead) {
-                        readList.add(entry);
+                    // Check if the record is upcoming or completed
+                    boolean isUpcoming = "scheduled".equalsIgnoreCase(status);
+
+                    String title = type;
+                    String message = isUpcoming ? "Scheduled for: " + date : "Completed on: " + date;
+
+                    NotifEntry entry = new NotifEntry(id, title, message, timestamp, !isUpcoming);
+
+                    if (isUpcoming) {
+                        upcomingList.add(entry);
                     } else {
-                        unreadList.add(entry);
+                        pastList.add(entry);
                     }
                 }
 
-                // Sort both lists with newest at the top
-                Collections.sort(unreadList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
-                Collections.sort(readList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
+                // Sort lists
+                Collections.sort(upcomingList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
+                Collections.sort(pastList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
 
                 updateUI();
             }
@@ -158,7 +159,7 @@ public class patientAlertsFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 if (isAdded()) {
-                    Toast.makeText(getContext(), "Failed to load notifications", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to load records", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -170,9 +171,9 @@ public class patientAlertsFragment extends Fragment {
         llNewNotifs.removeAllViews();
         llEarlierNotifs.removeAllViews();
 
-        tvUnreadCountLabel.setText(unreadList.size() + (unreadList.size() == 1 ? " unread notification" : " unread notifications"));
+        tvUnreadCountLabel.setText(upcomingList.size() + (upcomingList.size() == 1 ? " upcoming appointment" : " upcoming appointments"));
 
-        if (unreadList.isEmpty() && readList.isEmpty()) {
+        if (upcomingList.isEmpty() && pastList.isEmpty()) {
             tvEmptyState.setVisibility(View.VISIBLE);
             tvNewLabel.setVisibility(View.GONE);
             tvEarlierLabel.setVisibility(View.GONE);
@@ -181,22 +182,22 @@ public class patientAlertsFragment extends Fragment {
 
         tvEmptyState.setVisibility(View.GONE);
 
-        // Handle Unread (New)
-        if (unreadList.isEmpty()) {
+        // Render Upcoming
+        if (upcomingList.isEmpty()) {
             tvNewLabel.setVisibility(View.GONE);
         } else {
             tvNewLabel.setVisibility(View.VISIBLE);
-            for (NotifEntry entry : unreadList) {
+            for (NotifEntry entry : upcomingList) {
                 addCardToUI(llNewNotifs, entry);
             }
         }
 
-        // Handle Read (Earlier)
-        if (readList.isEmpty()) {
+        // Render Past Records
+        if (pastList.isEmpty()) {
             tvEarlierLabel.setVisibility(View.GONE);
         } else {
             tvEarlierLabel.setVisibility(View.VISIBLE);
-            for (NotifEntry entry : readList) {
+            for (NotifEntry entry : pastList) {
                 addCardToUI(llEarlierNotifs, entry);
             }
         }
@@ -212,38 +213,32 @@ public class patientAlertsFragment extends Fragment {
         TextView tvDate = card.findViewById(R.id.tvNotifDate);
         TextView tvUnreadDot = card.findViewById(R.id.tvUnreadDot);
 
-        tvTitle.setText(entry.title != null ? entry.title : "Alert");
+        tvTitle.setText(entry.title != null ? entry.title : "Record");
         tvMessage.setText(entry.message != null ? entry.message : "");
 
-        // Format timestamp
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         tvDate.setText(sdf.format(new Date(entry.timestamp)));
 
+        // If it is an UPCOMING appointment (isRead is false here), highlight it in blue
         if (!entry.isRead) {
             tvUnreadDot.setVisibility(View.VISIBLE);
             ivIcon.setBackgroundResource(R.drawable.circle_light_blue);
             ivIcon.setColorFilter(Color.parseColor("#1976D2"));
-
-            // Optional: Set up click listener to mark as read in Firebase when clicked
-            card.setOnClickListener(v -> {
-                FirebaseDatabase.getInstance().getReference("Notifications")
-                        .child(entry.id).child("isRead").setValue(true);
-            });
-
         } else {
+            // If it is a PAST record, show it in green
             tvUnreadDot.setVisibility(View.GONE);
-            ivIcon.setBackgroundResource(R.drawable.badge_green_light); // Assuming you have this light green background
+            ivIcon.setBackgroundResource(R.drawable.badge_green_light);
             ivIcon.setColorFilter(Color.parseColor("#81C784"));
-            tvTitle.setTextColor(Color.parseColor("#475569")); // Slightly dimmer text for read items
+            tvTitle.setTextColor(Color.parseColor("#475569"));
         }
 
-        // Change icon based on keywords in title
+        // Change icon based on keywords
         if (entry.title != null) {
             String t = entry.title.toLowerCase();
             if (t.contains("appointment") || t.contains("checkup") || t.contains("consultation")) {
                 ivIcon.setImageResource(android.R.drawable.ic_menu_today);
             } else if (t.contains("vaccine") || t.contains("immunization")) {
-                ivIcon.setImageResource(android.R.drawable.ic_menu_edit); // Substitute for a syringe if you don't have one
+                ivIcon.setImageResource(android.R.drawable.ic_menu_edit);
             }
         }
 
@@ -253,7 +248,7 @@ public class patientAlertsFragment extends Fragment {
     class NotifEntry {
         String id, title, message;
         long timestamp;
-        boolean isRead;
+        boolean isRead; // We are reusing this flag to mean "is this record in the past?"
 
         NotifEntry(String id, String title, String message, long timestamp, boolean isRead) {
             this.id = id;
