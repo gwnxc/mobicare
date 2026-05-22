@@ -212,7 +212,7 @@ public class view_mothers extends Fragment {
 
         for (PatientItem item : filteredList) {
             // Reusing your item_mother_card layout, but mapping the dynamic data to it
-            View card = getLayoutInflater().inflate(R.layout.item_mother_card, null);
+            View card = getLayoutInflater().inflate(R.layout.item_mother_card, llPatientsList, false);
 
             TextView tvName = card.findViewById(R.id.tvMotherName);
             TextView tvInfo1 = card.findViewById(R.id.tvPhone);

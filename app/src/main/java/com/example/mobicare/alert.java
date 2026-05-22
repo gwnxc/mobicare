@@ -194,7 +194,7 @@ public class alert extends Fragment {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy - hh:mm a", Locale.getDefault());
 
         for (NotificationItem item : allNotifications) {
-            View card = getLayoutInflater().inflate(R.layout.item_notification_card, null);
+            View card = getLayoutInflater().inflate(R.layout.item_notification_card, llNewNotifications, false);
 
             TextView tvTitle = card.findViewById(R.id.tvNotifTitle);
             TextView tvDesc = card.findViewById(R.id.tvNotifDesc);

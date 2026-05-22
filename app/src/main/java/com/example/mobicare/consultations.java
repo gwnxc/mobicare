@@ -36,11 +36,13 @@ public class consultations extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Point to the Consultations node from your screenshot
+        // Point to the Consultations node
         mDatabase = FirebaseDatabase.getInstance().getReference("Consultations");
 
         ImageView btnBack = view.findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> Navigation.findNavController(view).navigateUp());
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> Navigation.findNavController(view).navigateUp());
+        }
 
         llUpcoming = view.findViewById(R.id.llUpcoming);
         llCompleted = view.findViewById(R.id.llCompleted);
@@ -54,6 +56,9 @@ public class consultations extends Fragment {
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Safety check to prevent crashes if the fragment is closed while loading
+                if (!isAdded()) return;
+
                 if (llUpcoming != null) llUpcoming.removeAllViews();
                 if (llCompleted != null) llCompleted.removeAllViews();
 
@@ -70,17 +75,22 @@ public class consultations extends Fragment {
                     String healthWorker = consultSnap.child("healthWorker").getValue(String.class);
                     Long timestamp = consultSnap.child("timestamp").getValue(Long.class);
 
-                    // Create the view card
-                    View card = getLayoutInflater().inflate(R.layout.item_consultation_card, null);
+                    // Determine which list this card belongs to FIRST
+                    boolean isUpcoming = (timestamp != null && timestamp > currentTime);
+                    LinearLayout targetLayout = isUpcoming ? llUpcoming : llCompleted;
 
+                    // Inflate the card using the correct target layout
+                    View card = getLayoutInflater().inflate(R.layout.item_consultation_card, targetLayout, false);
+
+                    // Set the text fields
                     ((TextView) card.findViewById(R.id.tvPatientName)).setText(patientName != null ? patientName : "Unknown");
                     ((TextView) card.findViewById(R.id.tvPatientType)).setText(patientType != null ? patientType : "");
                     ((TextView) card.findViewById(R.id.tvPurpose)).setText("Purpose: " + (purpose != null ? purpose : ""));
                     ((TextView) card.findViewById(R.id.tvDateTime)).setText("📅 " + date + " at " + time);
                     ((TextView) card.findViewById(R.id.tvWorker)).setText("Assigned to: " + (healthWorker != null ? healthWorker : ""));
 
-                    // Sort into the correct list based on the timestamp
-                    if (timestamp != null && timestamp > currentTime) {
+                    // Add the card to the layout and update the counters
+                    if (isUpcoming) {
                         upcomingCount++;
                         llUpcoming.addView(card);
                     } else {
@@ -89,13 +99,16 @@ public class consultations extends Fragment {
                     }
                 }
 
+                // Update the headers with the final counts
                 if (tvUpcomingCount != null) tvUpcomingCount.setText("Upcoming (" + upcomingCount + ")");
                 if (tvCompletedCount != null) tvCompletedCount.setText("Completed (" + completedCount + ")");
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load consultations", Toast.LENGTH_SHORT).show();
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Failed to load consultations", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

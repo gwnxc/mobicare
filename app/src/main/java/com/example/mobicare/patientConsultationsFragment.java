@@ -62,8 +62,11 @@ public class patientConsultationsFragment extends Fragment {
         consultationsRef.orderByChild("patientUid").equalTo(loggedInUserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                llUpcoming.removeAllViews();
-                llCompleted.removeAllViews();
+                // Safety check to prevent crashes if the user leaves the screen quickly
+                if (!isAdded()) return;
+
+                if (llUpcoming != null) llUpcoming.removeAllViews();
+                if (llCompleted != null) llCompleted.removeAllViews();
 
                 int upcomingCount = 0;
                 int completedCount = 0;
@@ -87,22 +90,24 @@ public class patientConsultationsFragment extends Fragment {
                     }
                 }
 
-                tvUpcomingHeader.setText("Upcoming (" + upcomingCount + ")");
-                tvCompletedHeader.setText("Completed (" + completedCount + ")");
+                if (tvUpcomingHeader != null) tvUpcomingHeader.setText("Upcoming (" + upcomingCount + ")");
+                if (tvCompletedHeader != null) tvCompletedHeader.setText("Completed (" + completedCount + ")");
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load consultations", Toast.LENGTH_SHORT).show();
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Failed to load consultations", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
     private void addCardToUI(LinearLayout targetLayout, String name, String reason, String date, String secondaryInfo, String status, boolean isUpcoming) {
-        if (getContext() == null) return;
+        if (getContext() == null || targetLayout == null) return;
 
-        // Loads your newly named card file
-        View card = getLayoutInflater().inflate(R.layout.item_patient_consultation_card, null);
+        // ---> CRITICAL FIX: Passed targetLayout and false to keep your 24dp margin! <---
+        View card = getLayoutInflater().inflate(R.layout.item_patient_consultation_card, targetLayout, false);
 
         ImageView ivIcon = card.findViewById(R.id.ivIcon);
         TextView tvName = card.findViewById(R.id.tvPatientName);
@@ -112,33 +117,41 @@ public class patientConsultationsFragment extends Fragment {
         ImageView ivSecIcon = card.findViewById(R.id.ivSecondaryIcon);
         TextView tvSecText = card.findViewById(R.id.tvSecondaryText);
 
-        tvName.setText(name != null ? name : "Unknown Patient");
-        tvReason.setText(reason != null ? reason : "Consultation");
-        tvDate.setText(date != null ? date : "--");
-        tvBadge.setText(status != null ? status : "");
+        if (tvName != null) tvName.setText(name != null ? name : "Unknown Patient");
+        if (tvReason != null) tvReason.setText(reason != null ? reason : "Consultation");
+        if (tvDate != null) tvDate.setText(date != null ? date : "--");
+        if (tvBadge != null) tvBadge.setText(status != null ? status : "");
 
         if (isUpcoming) {
             // Setup Blue Theme
-            ivIcon.setImageResource(android.R.drawable.ic_menu_today);
-            ivIcon.setBackgroundResource(R.drawable.circle_light_blue);
-            ivIcon.setColorFilter(Color.parseColor("#1976D2"));
+            if (ivIcon != null) {
+                ivIcon.setImageResource(android.R.drawable.ic_menu_today);
+                ivIcon.setBackgroundResource(R.drawable.circle_light_blue);
+                ivIcon.setColorFilter(Color.parseColor("#1976D2"));
+            }
 
-            tvBadge.setBackgroundResource(R.drawable.badge_blue_light);
-            tvBadge.setTextColor(Color.parseColor("#1976D2"));
+            if (tvBadge != null) {
+                tvBadge.setBackgroundResource(R.drawable.badge_blue_light);
+                tvBadge.setTextColor(Color.parseColor("#1976D2"));
+            }
 
-            ivSecIcon.setImageResource(android.R.drawable.ic_menu_recent_history);
-            tvSecText.setText(secondaryInfo != null && !secondaryInfo.isEmpty() ? secondaryInfo : "Time TBD");
+            if (ivSecIcon != null) ivSecIcon.setImageResource(android.R.drawable.ic_menu_recent_history);
+            if (tvSecText != null) tvSecText.setText(secondaryInfo != null && !secondaryInfo.isEmpty() ? secondaryInfo : "Time TBD");
         } else {
             // Setup Green Theme
-            ivIcon.setImageResource(android.R.drawable.ic_menu_edit);
-            ivIcon.setBackgroundResource(R.drawable.badge_green_light);
-            ivIcon.setColorFilter(Color.parseColor("#388E3C"));
+            if (ivIcon != null) {
+                ivIcon.setImageResource(android.R.drawable.ic_menu_edit);
+                ivIcon.setBackgroundResource(R.drawable.badge_green_light);
+                ivIcon.setColorFilter(Color.parseColor("#388E3C"));
+            }
 
-            tvBadge.setBackgroundResource(R.drawable.badge_green_light);
-            tvBadge.setTextColor(Color.parseColor("#388E3C"));
+            if (tvBadge != null) {
+                tvBadge.setBackgroundResource(R.drawable.badge_green_light);
+                tvBadge.setTextColor(Color.parseColor("#388E3C"));
+            }
 
-            ivSecIcon.setImageResource(android.R.drawable.ic_menu_info_details);
-            tvSecText.setText(secondaryInfo != null && !secondaryInfo.isEmpty() ? secondaryInfo : "Health Worker");
+            if (ivSecIcon != null) ivSecIcon.setImageResource(android.R.drawable.ic_menu_info_details);
+            if (tvSecText != null) tvSecText.setText(secondaryInfo != null && !secondaryInfo.isEmpty() ? secondaryInfo : "Health Worker");
         }
 
         targetLayout.addView(card);

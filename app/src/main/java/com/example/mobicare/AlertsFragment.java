@@ -1,5 +1,7 @@
 package com.example.mobicare;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,37 +10,36 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.content.Context; // Needed for Context//
-import com.google.firebase.auth.FirebaseAuth; // Added
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query; // Added
 import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-
-import java.text.SimpleDateFormat; // Needed for SimpleDateFormat
-import java.util.Date; // Needed for Date
-import java.util.Locale; // Needed for Locale
-import java.util.concurrent.TimeUnit; // Needed for TimeUnit
+import java.util.Locale;
 
 public class AlertsFragment extends Fragment {
 
     private RecyclerView rvNotifications;
     private TextView tvSubtitle;
-    private DatabaseReference mDatabase;
     private List<Notification> notificationList = new ArrayList<>();
     private NotificationAdapter adapter;
-    private String currentUid; // Added to store current user ID
+    private String currentUid;
 
     @Nullable
     @Override
@@ -52,103 +53,191 @@ public class AlertsFragment extends Fragment {
         String userId = "";
 
         // 1. Check if a real Firebase Auth user exists (For Patients/Guardians)
-        if (com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null) {
-            userId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         }
-        // 2. If not, check SharedPreferences (For Health Workers like Maria)
+        // 2. If not, check SharedPreferences (Fixed spelling to match your other files!)
         else {
-            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", android.content.Context.MODE_PRIVATE);
-            userId = prefs.getString("loggedUserKey", "");
+            SharedPreferences prefs = requireContext().getSharedPreferences("MobicarePrefs", Context.MODE_PRIVATE);
+            userId = prefs.getString("loggedInUser", "");
         }
 
-        // 3. SET THE GLOBAL VARIABLE
         this.currentUid = userId;
-
-        // !!! DELETE OR COMMENT OUT THIS LINE BELOW !!!
-        // currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         rvNotifications = view.findViewById(R.id.rvNotifications);
         tvSubtitle = view.findViewById(R.id.tvSubtitle);
         ImageView btnBack = view.findViewById(R.id.btnBackAlerts);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference("Notifications");
-
         rvNotifications.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new NotificationAdapter(notificationList);
         rvNotifications.setAdapter(adapter);
 
-        btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
+        if (btnBack != null) btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
 
-        // Only load if we actually have a valid ID
-        // Inside onViewCreated, under loadNotifications()
+        // Kick off the Master Activity Feed chain!
+        // We now start it regardless of whether the UID is empty, because Health Workers
+        // always need to see the global Consultations and Inventory!
         if (currentUid != null && !currentUid.isEmpty()) {
             loadNotifications();
-            checkConsultationAlerts(); // Add this line!
+        } else {
+            // Skip direct notifications, jump straight to the global feed
+            fetchConsultationFeed();
         }
-        // ---> FIXED: INITIALIZE NAVIGATION SYSTEM FOR ALERTS CONTEXT SCREEN RIGHT HERE <---
+
         setupHealthWorkerNavigation(view, "alerts");
     }
 
+    // --- STEP 1: Fetch Direct Notifications (Just in case) ---
     private void loadNotifications() {
+        notificationList.clear();
         DatabaseReference notifRef = FirebaseDatabase.getInstance().getReference("Notifications");
 
-        // FIX: Always query by the current user's UID regardless of role
-        // This assumes currentUid was set correctly during login
         notifRef.orderByChild("receiverUid").equalTo(currentUid)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (!isAdded()) return;
-                        notificationList.clear();
 
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             Notification notification = ds.getValue(Notification.class);
-                            android.util.Log.d("FIREBASE_DEBUG", "Notification Title: " + (notification != null ? notification.title : "NULL")); if (notification != null) {
+                            if (notification != null) {
                                 notification.id = ds.getKey();
                                 notificationList.add(notification);
                             }
                         }
-                        Collections.sort(notificationList, (n1, n2) -> Long.compare(n2.timestamp, n1.timestamp));
-                        adapter.notifyDataSetChanged();
-                        updateSubtitle(notificationList.size());
+
+                        // Once done, fetch the clinical events
+                        fetchConsultationFeed();
                     }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                    @Override public void onCancelled(@NonNull DatabaseError error) {
+                        if (isAdded()) fetchConsultationFeed();
+                    }
                 });
     }
 
-    private void updateSubtitle(int count) {
-        if (tvSubtitle != null) {
-            tvSubtitle.setText(count + " unread notifications");
-        }
-    }
+    // --- STEP 2: Fetch Consultations (Appointments, Checkups, Cancellations) ---
+    private void fetchConsultationFeed() {
+        DatabaseReference consultRef = FirebaseDatabase.getInstance().getReference("Consultations");
 
-    // Optional: If you want everything marked as read when they EXIT the screen
-    @Override
-    public void onPause() {
-        super.onPause();
-        // markAllAsRead(); // Uncomment if you want this behavior
-    }
-
-    private void markAllAsRead() {
-        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", Context.MODE_PRIVATE);
-        String userRole = prefs.getString("userRole", "Patient");
-
-        Query query = "Patient".equalsIgnoreCase(userRole)
-                ? mDatabase.orderByChild("receiverUid").equalTo(currentUid)
-                : mDatabase.orderByChild("receiverUid").equalTo("Admin");
-
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        consultRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!isAdded()) return;
+                long currentTime = System.currentTimeMillis();
+
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    if (Boolean.FALSE.equals(ds.child("isRead").getValue(Boolean.class))) {
-                        ds.getRef().child("isRead").setValue(true);
+                    String status = ds.child("status").getValue(String.class);
+                    String patientName = ds.child("patientName").getValue(String.class);
+                    String purpose = ds.child("purpose").getValue(String.class);
+                    if (purpose == null) purpose = ds.child("type").getValue(String.class); // fallback
+                    String date = ds.child("date").getValue(String.class);
+                    Long timestamp = ds.child("timestamp").getValue(Long.class);
+
+                    if (patientName != null && timestamp != null) {
+                        Notification n = new Notification();
+                        n.id = ds.getKey();
+                        n.timestamp = timestamp;
+
+                        // Build the text dynamically based on the status
+                        if ("cancelled".equalsIgnoreCase(status)) {
+                            n.title = "Cancelled: " + purpose;
+                            n.message = patientName + "'s appointment was cancelled.";
+                        } else if ("scheduled".equalsIgnoreCase(status) || timestamp > currentTime) {
+                            n.title = "Upcoming: " + purpose;
+                            n.message = patientName + " is scheduled on " + date;
+                        } else {
+                            n.title = "Record Added";
+                            n.message = purpose + " completed for " + patientName;
+                        }
+
+                        notificationList.add(n);
                     }
                 }
+
+                // Once done, fetch the inventory warnings
+                fetchInventoryFeed();
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {
+                if (isAdded()) fetchInventoryFeed();
+            }
+        });
+    }
+
+    // --- STEP 3: Fetch Inventory Warnings (Low stock, expiring) ---
+    private void fetchInventoryFeed() {
+        DatabaseReference invRef = FirebaseDatabase.getInstance().getReference("Inventory");
+
+        invRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!isAdded()) return;
+                long currentTime = System.currentTimeMillis();
+                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    String name = ds.child("itemName").getValue(String.class);
+                    String qtyStr = ds.child("quantity").getValue(String.class);
+                    String expiryStr = ds.child("expiryDate").getValue(String.class);
+
+                    if (name == null) continue;
+
+                    // Low Quantity Check
+                    try {
+                        if (qtyStr != null && Integer.parseInt(qtyStr) <= 20) {
+                            Notification n = new Notification();
+                            n.id = ds.getKey() + "_qty";
+                            n.title = "Low Stock Alert";
+                            n.message = name + " only has " + qtyStr + " left in inventory.";
+                            n.timestamp = currentTime;
+                            notificationList.add(n);
+                        }
+                    } catch (Exception ignored) {}
+
+                    // Expiry Check
+                    try {
+                        if (expiryStr != null && !expiryStr.equals("No Expiry") && !expiryStr.isEmpty()) {
+                            Date expDate = sdf.parse(expiryStr);
+                            if (expDate != null) {
+                                long days = (expDate.getTime() - currentTime) / (1000 * 60 * 60 * 24);
+                                if (days < 0) {
+                                    Notification n = new Notification();
+                                    n.id = ds.getKey() + "_exp1";
+                                    n.title = "Expired Item";
+                                    n.message = name + " has expired!";
+                                    n.timestamp = currentTime;
+                                    notificationList.add(n);
+                                } else if (days <= 30) {
+                                    Notification n = new Notification();
+                                    n.id = ds.getKey() + "_exp2";
+                                    n.title = "Expiring Soon";
+                                    n.message = name + " expires in " + days + " days.";
+                                    n.timestamp = currentTime;
+                                    notificationList.add(n);
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                }
+
+                // FINALLY, sort the combined list and draw it to the screen!
+                Collections.sort(notificationList, (n1, n2) -> Long.compare(n2.timestamp, n1.timestamp));
+                adapter.notifyDataSetChanged();
+                updateSubtitle(notificationList.size());
+
+                // DIAGNOSTIC TOAST: If you see "Found 0 items", your Firebase tables might be empty.
+                // If you see "Found X items" but the screen is blank, there is an issue with your XML ID names.
+                Toast.makeText(getContext(), "Loaded " + notificationList.size() + " feed items", Toast.LENGTH_SHORT).show();
             }
             @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
+
+    private void updateSubtitle(int count) {
+        if (tvSubtitle != null) {
+            tvSubtitle.setText(count + " alerts and events");
+        }
+    }
+
     private void setupHealthWorkerNavigation(View view, String activeTab) {
         View navBarContainer = view.findViewById(R.id.healthWorkerNavBar);
         if (navBarContainer == null) return;
@@ -195,64 +284,7 @@ public class AlertsFragment extends Fragment {
             customNavProfile.setOnClickListener(v -> Navigation.findNavController(view).navigate(R.id.profileFragment));
         }
     }
-    private void checkConsultationAlerts() {
-        DatabaseReference consultRef = FirebaseDatabase.getInstance().getReference("Consultations");
-        DatabaseReference notifRef = FirebaseDatabase.getInstance().getReference("Notifications");
 
-        consultRef.orderByChild("patientUid").equalTo(currentUid)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                            String date = ds.child("date").getValue(String.class);
-                            String purpose = ds.child("reason").getValue(String.class);
-                            String msg = "Your " + (purpose != null ? purpose : "consultation") + " is on " + date;
-
-                            if (date != null && isDateNear(date)) {
-                                // Check Firebase to see if this specific alert already exists
-                                notifRef.orderByChild("receiverUid").equalTo(currentUid)
-                                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot notifSnap) {
-                                                boolean exists = false;
-                                                for (DataSnapshot n : notifSnap.getChildren()) {
-                                                    if (msg.equals(n.child("message").getValue(String.class))) {
-                                                        exists = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if (!exists) {
-                                                    NotificationHelper.sendPatientNotification(currentUid, "Consultation Alert", msg, "Reminder");
-                                                }
-                                            }
-                                            @Override public void onCancelled(@NonNull DatabaseError error) {}
-                                        });
-                            }
-                        }
-                    }
-                    @Override public void onCancelled(@NonNull DatabaseError error) {}
-                });
-    }
-    private boolean isDateNear(String dateStr) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date targetDate = sdf.parse(dateStr);
-            Date today = new Date();
-
-            // Calculate difference in days
-            long diffInMillies = Math.abs(targetDate.getTime() - today.getTime());
-            long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-            // Return true if it's within 3 days (or any threshold you prefer)
-            return diffInDays <= 3 && targetDate.after(today);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    private void showNotification(String title, String message) {
-        // This is a simple Toast for now to demonstrate the alert
-        android.widget.Toast.makeText(getContext(), title + ": " + message, android.widget.Toast.LENGTH_LONG).show();
-    }
     private void highlightActiveTab(View parentView, int iconResId, int textResId) {
         ImageView icon = parentView.findViewById(iconResId);
         TextView text = parentView.findViewById(textResId);

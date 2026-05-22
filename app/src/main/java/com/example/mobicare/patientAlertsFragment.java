@@ -191,8 +191,10 @@ public class patientAlertsFragment extends Fragment {
     }
 
     private void addCardToUI(LinearLayout targetLayout, NotifEntry entry) {
-        if (getContext() == null) return;
-        View card = getLayoutInflater().inflate(R.layout.item_patient_notification, null);
+        if (getContext() == null || targetLayout == null) return;
+
+        // ---> CRITICAL FIX: Changed null to targetLayout and false <---
+        View card = getLayoutInflater().inflate(R.layout.item_patient_notification, targetLayout, false);
 
         ImageView ivIcon = card.findViewById(R.id.ivNotifIcon);
         TextView tvTitle = card.findViewById(R.id.tvNotifTitle);

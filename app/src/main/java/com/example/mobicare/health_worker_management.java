@@ -183,7 +183,8 @@ public class health_worker_management extends Fragment {
     }
 
     private void addWorkerCardToUI(WorkerItem worker) {
-        View card = getLayoutInflater().inflate(R.layout.item_worker_card, null);
+        View card = getLayoutInflater().inflate(R.layout.item_worker_card, llWorkerList, false);
+
 
         TextView tvName = card.findViewById(R.id.tvName);
         TextView tvSpec = card.findViewById(R.id.tvSpec);

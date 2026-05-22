@@ -183,7 +183,7 @@ public class inventory extends Fragment {
     }
 
     private void addInventoryCardToUI(String id, String name, String type, String qty, String expiry) {
-        View card = getLayoutInflater().inflate(R.layout.item_inventory_card, null);
+        View card = getLayoutInflater().inflate(R.layout.item_inventory_card, llInventoryList, false);
 
         TextView tvName = card.findViewById(R.id.tvItemName);
         TextView tvType = card.findViewById(R.id.tvItemType);

@@ -98,7 +98,8 @@ public class myChildrenFragment extends Fragment {
     }
 
     private void addCardToUI(String childId, String name, String age, String gender, String weight, String height, View mainView) {
-        View card = getLayoutInflater().inflate(R.layout.item_child_card, null);
+        // Pass the parent layout (llChildrenList) and 'false' so it keeps your XML margins!
+        View card = getLayoutInflater().inflate(R.layout.item_child_card, llChildrenList, false);
 
         TextView tvName = card.findViewById(R.id.tvChildName);
         TextView tvBasic = card.findViewById(R.id.tvChildBasicDetails);
