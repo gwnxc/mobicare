@@ -92,35 +92,28 @@ public class AlertsFragment extends Fragment {
     private void loadNotifications() {
         DatabaseReference notifRef = FirebaseDatabase.getInstance().getReference("Notifications");
 
-        // 1. Get role to decide the "Target"
-        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MobiCarePrefs", Context.MODE_PRIVATE);
-        String userRole = prefs.getString("userRole", "Patient");
+        // FIX: Always query by the current user's UID regardless of role
+        // This assumes currentUid was set correctly during login
+        notifRef.orderByChild("receiverUid").equalTo(currentUid)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!isAdded()) return;
+                        notificationList.clear();
 
-        // 2. Define the target receiver
-        String targetReceiver = "Patient".equalsIgnoreCase(userRole) ? currentUid : "HealthWorker";
-
-        // 3. Query based on the target
-        Query query = notifRef.orderByChild("receiverUid").equalTo(targetReceiver);
-
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!isAdded()) return;
-                notificationList.clear();
-
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    Notification notification = ds.getValue(Notification.class);
-                    if (notification != null) {
-                        notification.id = ds.getKey();
-                        notificationList.add(notification);
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            Notification notification = ds.getValue(Notification.class);
+                            android.util.Log.d("FIREBASE_DEBUG", "Notification Title: " + (notification != null ? notification.title : "NULL")); if (notification != null) {
+                                notification.id = ds.getKey();
+                                notificationList.add(notification);
+                            }
+                        }
+                        Collections.sort(notificationList, (n1, n2) -> Long.compare(n2.timestamp, n1.timestamp));
+                        adapter.notifyDataSetChanged();
+                        updateSubtitle(notificationList.size());
                     }
-                }
-                // Sort by timestamp if needed
-                Collections.reverse(notificationList);
-                adapter.notifyDataSetChanged();
-            }
-            @Override public void onCancelled(@NonNull DatabaseError error) {}
-        });
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 
     private void updateSubtitle(int count) {
@@ -204,15 +197,36 @@ public class AlertsFragment extends Fragment {
     }
     private void checkConsultationAlerts() {
         DatabaseReference consultRef = FirebaseDatabase.getInstance().getReference("Consultations");
+        DatabaseReference notifRef = FirebaseDatabase.getInstance().getReference("Notifications");
+
         consultRef.orderByChild("patientUid").equalTo(currentUid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             String date = ds.child("date").getValue(String.class);
+                            String purpose = ds.child("reason").getValue(String.class);
+                            String msg = "Your " + (purpose != null ? purpose : "consultation") + " is on " + date;
+
                             if (date != null && isDateNear(date)) {
-                                // TRIGGER UI ALERT OR NOTIFICATION
-                                showNotification("Consultation Alert", "You have a consultation on " + date);
+                                // Check Firebase to see if this specific alert already exists
+                                notifRef.orderByChild("receiverUid").equalTo(currentUid)
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot notifSnap) {
+                                                boolean exists = false;
+                                                for (DataSnapshot n : notifSnap.getChildren()) {
+                                                    if (msg.equals(n.child("message").getValue(String.class))) {
+                                                        exists = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if (!exists) {
+                                                    NotificationHelper.sendPatientNotification(currentUid, "Consultation Alert", msg, "Reminder");
+                                                }
+                                            }
+                                            @Override public void onCancelled(@NonNull DatabaseError error) {}
+                                        });
                             }
                         }
                     }

@@ -123,6 +123,7 @@ public class patientDashboardFragment extends Fragment {
 
         // Fetch User Data and update dashboard!
         fetchUserData(view);
+        loadUpcomingVisits();
     }
 
     private void fetchUserData(View view) {
@@ -271,6 +272,53 @@ public class patientDashboardFragment extends Fragment {
                 ivActivityIcon.setImageResource(android.R.drawable.ic_menu_today);
                 ivActivityIcon.setColorFilter(tvStatusBadge.getCurrentTextColor());
                 break;
+        }
+    }
+    private void loadUpcomingVisits() {
+        // 1. Use a Query with a limit or specific index if possible
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Consultations");
+
+        ref.orderByChild("patientUid").equalTo(loggedInUserId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        // Run the list building on the background-intent if the snapshot is huge,
+                        // but for now, just keep it clean:
+                        List<String> visitDates = new ArrayList<>();
+                        for (DataSnapshot data : snapshot.getChildren()) {
+                            String date = data.child("date").getValue(String.class);
+                            if (date != null) visitDates.add(date);
+                        }
+
+                        // Use 'post' to ensure UI updates happen after the current cycle
+                        View view = getView();
+                        if (view != null) {
+                            view.post(() -> setupCalendarListener(visitDates));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+    }
+
+    private void setupCalendarListener(List<String> visitDates) {
+        android.widget.CalendarView calendarView = getView().findViewById(R.id.dashboardCalendar);
+
+        if (calendarView != null) {
+            // Use a simple guard to prevent multiple attachments
+            calendarView.setOnDateChangeListener(null);
+
+            calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+                // Use local variables to avoid heavy object creation
+                String selectedDate = String.format("%02d/%02d/%d", dayOfMonth, (month + 1), year);
+
+                if (visitDates.contains(selectedDate)) {
+                    Toast.makeText(getContext(), "Scheduled visit on " + selectedDate, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "No scheduled visits.", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

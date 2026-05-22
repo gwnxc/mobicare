@@ -78,7 +78,7 @@
             <ImageView
                 android:layout_width="14dp"
                 android:layout_height="14dp"
-                android:src="@android:drawable/ic_menu_my_calendar"
+                android:src="@drawable/ic_calendar"
                 app:tint="#94A3B8" />
 
             <TextView

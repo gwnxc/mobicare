@@ -29,38 +29,35 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Notification n = notifications.get(position);
 
-        holder.tvTitle.setText(n.title);
-        holder.tvMessage.setText(n.message);
-        holder.tvDate.setText(n.date);
+        holder.tvTitle.setText(n.title != null ? n.title : "No Title");
+        holder.tvMessage.setText(n.message != null ? n.message : "");
 
-        // 1. Safe Unread Status Dot Logic
-        // Use Boolean.TRUE.equals to safely check the Boolean Object
+        // Use the helper method
+        holder.tvDate.setText(n.getDisplayDate());
+
         boolean isRead = Boolean.TRUE.equals(n.isRead);
 
+        // Visibility
         holder.ivUnreadDot.setVisibility(isRead ? View.GONE : View.VISIBLE);
 
-        // 2. Perspective Icon Logic
+        // Icon logic
         if (isRead) {
-            holder.ivIcon.setImageResource(R.drawable.ic_notifications);
+            holder.ivIcon.setImageResource(R.drawable.ic_notifications); // Assuming you have this
             holder.ivIcon.setAlpha(0.6f);
         } else {
-            holder.ivIcon.setImageResource(R.drawable.ic_notifications_active);
+            holder.ivIcon.setImageResource(R.drawable.ic_notifications_active); // Make sure this exists
             holder.ivIcon.setAlpha(1.0f);
         }
 
-        // 3. Mark as Read on Click
         holder.itemView.setOnClickListener(v -> {
             if (!Boolean.TRUE.equals(n.isRead) && n.id != null) {
-                // Update Firebase
                 FirebaseDatabase.getInstance().getReference("Notifications")
                         .child(n.id)
-                        .child("isRead").setValue(true);
-
-                // Update local object
-                n.isRead = true;
-
-                // Refresh only this specific row
-                notifyItemChanged(position);
+                        .child("isRead").setValue(true)
+                        .addOnSuccessListener(aVoid -> {
+                            n.isRead = true;
+                            notifyItemChanged(position);
+                        });
             }
         });
     }

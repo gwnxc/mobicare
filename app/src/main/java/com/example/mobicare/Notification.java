@@ -1,24 +1,27 @@
 package com.example.mobicare;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class Notification {
     public String id;
     public String title;
     public String message;
-    public String date; // Keep this if you use it for UI
+    public String date;
     public String type;
     public String receiverUid;
     public Boolean isRead;
-    public long timestamp; // ADD THIS to match your Firebase data
+    public long timestamp;
 
     public Notification() {}
 
-    public Notification(String title, String message, String date, String type, String receiverUid, long timestamp) {
-        this.title = title;
-        this.message = message;
-        this.date = date;
-        this.type = type;
-        this.receiverUid = receiverUid;
-        this.isRead = false;
-        this.timestamp = timestamp;
+    // Add a getter to ensure the UI always gets a string
+    public String getDisplayDate() {
+        if (date != null && !date.isEmpty()) return date;
+        if (timestamp > 0) {
+            return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date(timestamp));
+        }
+        return "";
     }
 }

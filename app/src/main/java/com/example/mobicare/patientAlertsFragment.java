@@ -71,7 +71,7 @@ public class patientAlertsFragment extends Fragment {
 
         if (loggedInUserId != null) {
             // Now fetches from your actual records instead of the empty notifications folder
-            fetchMedicalRecords();
+            fetchNotifications();
         }
     }
 
@@ -108,61 +108,48 @@ public class patientAlertsFragment extends Fragment {
         }
     }
 
-    private void fetchMedicalRecords() {
-        // Look directly at the Consultations database folder
-        DatabaseReference recordsRef = FirebaseDatabase.getInstance().getReference("Consultations");
+    private void fetchNotifications() {
+        DatabaseReference notifRef = FirebaseDatabase.getInstance().getReference("Notifications");
 
-        recordsRef.orderByChild("patientUid").equalTo(loggedInUserId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!isAdded()) return;
+        // Query specifically for the current patient's UID
+        notifRef.orderByChild("receiverUid").equalTo(loggedInUserId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!isAdded()) return;
 
-                upcomingList.clear();
-                pastList.clear();
+                        upcomingList.clear();
+                        pastList.clear();
 
-                for (DataSnapshot snap : snapshot.getChildren()) {
-                    String id = snap.getKey();
+                        for (DataSnapshot snap : snapshot.getChildren()) {
+                            // Map the Firebase data to your NotifEntry class
+                            String id = snap.getKey();
+                            String title = snap.child("title").getValue(String.class);
+                            String message = snap.child("message").getValue(String.class);
+                            Long timestamp = snap.child("timestamp").getValue(Long.class);
+                            Boolean isRead = snap.child("isRead").getValue(Boolean.class);
 
-                    // Pull the actual medical details
-                    String type = snap.child("type").getValue(String.class); // e.g., Vaccine, Checkup
-                    String date = snap.child("date").getValue(String.class);
-                    String status = snap.child("status").getValue(String.class);
-                    Long timestamp = snap.child("timestamp").getValue(Long.class);
+                            if (timestamp == null) timestamp = System.currentTimeMillis();
+                            if (isRead == null) isRead = false;
 
-                    if (type == null) type = "Medical Record";
-                    if (date == null) date = "Date TBD";
-                    if (timestamp == null) timestamp = System.currentTimeMillis();
-                    if (status == null) status = "completed";
+                            NotifEntry entry = new NotifEntry(id, title, message, timestamp, isRead);
 
-                    // Check if the record is upcoming or completed
-                    boolean isUpcoming = "scheduled".equalsIgnoreCase(status);
+                            // Sort into categories based on isRead (or any other flag you want)
+                            if (!isRead) {
+                                upcomingList.add(entry);
+                            } else {
+                                pastList.add(entry);
+                            }
+                        }
 
-                    String title = type;
-                    String message = isUpcoming ? "Scheduled for: " + date : "Completed on: " + date;
+                        Collections.sort(upcomingList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
+                        Collections.sort(pastList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
 
-                    NotifEntry entry = new NotifEntry(id, title, message, timestamp, !isUpcoming);
-
-                    if (isUpcoming) {
-                        upcomingList.add(entry);
-                    } else {
-                        pastList.add(entry);
+                        updateUI();
                     }
-                }
 
-                // Sort lists
-                Collections.sort(upcomingList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
-                Collections.sort(pastList, (a, b) -> Long.compare(b.timestamp, a.timestamp));
-
-                updateUI();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                if (isAdded()) {
-                    Toast.makeText(getContext(), "Failed to load records", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+                    @Override public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 
     private void updateUI() {
@@ -219,13 +206,14 @@ public class patientAlertsFragment extends Fragment {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         tvDate.setText(sdf.format(new Date(entry.timestamp)));
 
-        // If it is an UPCOMING appointment (isRead is false here), highlight it in blue
+        // Inside addCardToUI
         if (!entry.isRead) {
+            // UNREAD: Blue highlight
             tvUnreadDot.setVisibility(View.VISIBLE);
             ivIcon.setBackgroundResource(R.drawable.circle_light_blue);
             ivIcon.setColorFilter(Color.parseColor("#1976D2"));
         } else {
-            // If it is a PAST record, show it in green
+            // READ: Grey/Green highlight
             tvUnreadDot.setVisibility(View.GONE);
             ivIcon.setBackgroundResource(R.drawable.badge_green_light);
             ivIcon.setColorFilter(Color.parseColor("#81C784"));
@@ -241,6 +229,20 @@ public class patientAlertsFragment extends Fragment {
                 ivIcon.setImageResource(android.R.drawable.ic_menu_edit);
             }
         }
+
+        card.setOnClickListener(v -> {
+            if (!entry.isRead) {
+                FirebaseDatabase.getInstance().getReference("Notifications")
+                        .child(entry.id)
+                        .child("isRead").setValue(true);
+
+                // Optional: Visually update the UI immediately
+                tvUnreadDot.setVisibility(View.GONE);
+                ivIcon.setBackgroundResource(R.drawable.badge_green_light);
+                ivIcon.setColorFilter(Color.parseColor("#81C784"));
+                tvTitle.setTextColor(Color.parseColor("#475569"));
+            }
+        });
 
         targetLayout.addView(card);
     }

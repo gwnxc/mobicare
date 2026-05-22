@@ -21,7 +21,7 @@
             <View
                 android:id="@+id/headerBackground"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="260dp"
                 android:background="@drawable/header_rounded_bottom"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -109,25 +109,43 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvCalendar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@+id/llSummary">
+
+                <CalendarView
+                    android:id="@+id/dashboardCalendar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:dateTextAppearance="@android:style/TextAppearance.Material.Small"
+                    android:weekDayTextAppearance="@android:style/TextAppearance.Material.Small" />
+            </com.google.android.material.card.MaterialCardView>
+
             <TextView
                 android:id="@+id/tvQuickActionsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="36dp"
+                android:layout_marginTop="20dp"
                 android:text="Quick Actions"
                 android:textColor="@color/slate_navy"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/headerBackground" />
+                app:layout_constraintTop_toBottomOf="@+id/cvCalendar" />
 
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/glQuickActions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:padding="12dp"
+                android:padding="1dp"
                 app:columnCount="2"
                 app:layout_constraintTop_toBottomOf="@+id/tvQuickActionsLabel">
 
@@ -170,8 +188,8 @@
                 android:id="@+id/cvMyRecord"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
                 android:layout_marginTop="8dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -181,7 +199,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/glQuickActions">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -210,7 +227,7 @@
                             android:layout_height="wrap_content"
                             android:text="My Health Record"
                             android:textColor="#1E293B"
-                            android:textSize="18sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -219,7 +236,7 @@
                             android:layout_marginTop="2dp"
                             android:text="View your prenatal data"
                             android:textColor="@color/slate_navy"
-                            android:textSize="14sp" />
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -380,10 +380,23 @@ public class AddConsultationFragment extends Fragment {
         data.put("notes", etNotes.getText().toString());
         data.put("status", "scheduled");
 
+        // Add this to your data HashMap
+        String notifId = FirebaseDatabase.getInstance().getReference("Notifications").push().getKey();
+        data.put("notificationId", notifId); // Link the notification to the record
+
+        // Inside saveConsultationRecord()
         consultRef.setValue(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                // Ensure linkedPatientUid is not empty before sending
+                if (linkedPatientUid != null && !linkedPatientUid.isEmpty()) {
+                    NotificationHelper.sendPatientNotification(
+                            linkedPatientUid,
+                            "New Consultation",
+                            "A consultation record for '" + etPurpose.getText().toString() + "' has been added.",
+                            "Consultation"
+                    );
+                }
                 Toast.makeText(getContext(), "Consultation Saved!", Toast.LENGTH_SHORT).show();
-
                 Navigation.findNavController(requireView()).navigateUp();
             }
         });
@@ -490,9 +503,18 @@ public class AddConsultationFragment extends Fragment {
         data.put("timestamp", ServerValue.TIMESTAMP);
         data.put("childId", linkedPatientUid); // Now it will be searchable by ID!
 
+        // Inside saveImmunizationRecord()
         immRef.setValue(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Toast.makeText(getContext(), "Immunization Saved & Inventory Updated!", Toast.LENGTH_SHORT).show();
+                // TRIGGER NEXT VISIT REMINDER
+                String nextDate = etNextImmDate.getText().toString();
+                NotificationHelper.sendPatientNotification(
+                        linkedPatientUid,
+                        "Next Immunization Schedule",
+                        "Your next scheduled immunization is on: " + nextDate,
+                        "Reminder"
+                );
+                Toast.makeText(getContext(), "Immunization Saved!", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).navigateUp();
             }
         });
@@ -516,6 +538,17 @@ public class AddConsultationFragment extends Fragment {
 
         prenatalRef.setValue(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                // TRIGGER PRENATAL NOTIFICATION
+                String returnDate = etReturnCheckup.getText().toString().trim();
+                if (!returnDate.isEmpty()) {
+                    NotificationHelper.sendPatientNotification(
+                            linkedPatientUid,
+                            "Prenatal Follow-up",
+                            "Your next prenatal checkup is scheduled for: " + returnDate,
+                            "Reminder"
+                    );
+                }
+
                 Toast.makeText(getContext(), "Prenatal Record Saved!", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).navigateUp();
             }
